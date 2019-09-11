@@ -8,22 +8,15 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-10 mx-auto">
-                            <h1 class="py-1 text-center" style="font-size: 50px !important;">Over Ons</h1>
-                            <div class="accordion" id="faq">
-
-                            </div>
+                            {!! Editor('over_ons_paragraaf_1', 'richtext', false, '<h1 class="py-1 text-center" style="font-size: 50px !important;">Over Ons</h1>') !!}
                             <br>
                         </div>
                     </div>
-                    <!--/row-->
                 </div>
-                <!--container-->
             </div>
         </div>
 
     </div>
-
-    {{--@include('includes.benefit')--}}
 
 @endsection
 
@@ -47,5 +40,4 @@
 
 @push('js')
     <script src="/js/categories_custom.js" type="text/javascript"></script>
-
 @endpush

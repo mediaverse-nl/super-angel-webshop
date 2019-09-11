@@ -34,15 +34,14 @@
                                 </span>
                                 <input id="productThumbnail" class="form-control" type="text" disabled
                                        value="">
-                                <input type="hidden" id="productThumbnailCopy" class="form-control" name="images"
-                                       value="">
+                                {!! Form::hidden('images', null, ['id' => 'productThumbnailCopy', 'class' => 'form-control'.(!$errors->has('images') ? '': ' is-invalid ')]) !!}
                             </div>
                             <div id="imgHolder" style="margin-top:15px;max-height:100px;"></div>
                         </div>
 
                         <div class="form-group">
-                            {!! Form::label('category', 'category') !!}
-                            {!! Form::select('category', \App\Category::parents()->pluck('value', 'id'), null, ['class' => 'form-control'.(!$errors->has('category') ? '': ' is-invalid ')]) !!}
+                            {!! Form::label('category_id', 'category') !!}
+                            {!! Form::select('category_id', \App\Category::parents()->pluck('value', 'id'), null, ['class' => 'form-control'.(!$errors->has('category') ? '': ' is-invalid ')]) !!}
                             @include('components.error', ['field' => 'category'])
                         </div>
 

@@ -31,12 +31,31 @@ class Product extends Model
 
     public function productOrders()
     {
-        return $this->hasMany('App\ProductDetail', 'product_id', 'id');
+        return $this->hasMany('App\ProductOrder', 'product_id', 'id');
     }
 
     public function category()
     {
         return $this->belongsTo('App\Category', 'category_id', 'id');
+    }
+
+    public function taxPrice()
+    {
+        $bedrag_inc = $this->price();
+        $btw = 21; // 0 - 6 - 19
+
+//        echo 'Bedrag inclusief: '.$bedrag_inc .'<br>';
+
+        return number_format($bedrag_inc/(100+$btw)*100, 2);
+//        echo 'Bedrag exclusief: '.$bedrag_ex.'<br>'; //totaal
+
+//        $bedrag_ex = round($bedrag_ex, 2); //totaal afgerond
+//        echo 'Eindbedrag: '.$bedrag_ex.'<br>';
+    }
+
+    public function price()
+    {
+        return number_format($this->price - $this->discount, 2);
     }
 
     public function isNewProduct()
@@ -67,7 +86,12 @@ class Product extends Model
 
     public function thumbnail()
     {
-        return $this->images(1)[0];
+        $getImage = $this->images(1)[0];
+        if ($getImage == null){
+            return '/images/geen-foto-beschikbaar.png';
+        }
+
+        return $getImage;
     }
 
     public function getSelectedDetail($detail)
@@ -87,7 +111,16 @@ class Product extends Model
 
     public function getUrlTitleAttribute()
     {
-        return str_replace('-', '-',  rtrim($this->title));
+//        function url($url) {
+            $url = preg_replace('~[^\\pL0-9_]+~u', '-', $this->title);
+            $url = trim($url, "-");
+            $url = iconv("utf-8", "us-ascii//TRANSLIT", $url);
+            $url = strtolower($url);
+            $url = preg_replace('~[^-a-z0-9_]+~', '', $url);
+            return $url;
+//        }
+
+//        return str_replace(' ', '-',  rtrim($this->title));
     }
 
     public function getProductPriceAttribute()
@@ -97,7 +130,7 @@ class Product extends Model
 
     public function getDiscountPriceAttribute()
     {
-        return '&euro; '.number_format($this->price - $this->discount, 2);
+        return '&euro; '.number_format($this->price(), 2);
     }
 
     public function getProductNameAttribute()

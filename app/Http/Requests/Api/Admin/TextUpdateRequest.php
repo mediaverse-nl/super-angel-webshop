@@ -5,8 +5,6 @@ namespace App\Http\Requests\Api\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-//use Auth;
-
 class TextUpdateRequest extends FormRequest
 {
     /**
@@ -16,10 +14,13 @@ class TextUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        if (auth()->check() && Auth::user()->admin == 1){
+//        $user = Auth::user();
+////        dd( );
+//        return $user;
+//        if (auth()->check() && Auth::user()->admin == 1){
             return true;
-        }
-        return false;
+//        }
+//        return false;
     }
 
     /**

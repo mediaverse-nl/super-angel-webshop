@@ -15,7 +15,7 @@ class Review extends Model
 
     public $timestamps = true;
 
-    protected $fillable = ['user_id', 'activity_id', 'text', 'rating'];
+    protected $fillable = ['user_id', 'product_id', 'text', 'name', 'rating'];
 
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
@@ -26,7 +26,7 @@ class Review extends Model
 
     public function review()
     {
-        return $this->belongsTo('App\Activity', 'activity_id', 'id');
+        return $this->belongsTo('App\Product', 'product_id', 'id');
     }
 
 }

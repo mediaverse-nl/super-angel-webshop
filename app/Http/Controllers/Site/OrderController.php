@@ -7,6 +7,7 @@ use App\Mail\OrderConfirmation;
 use App\Order;
 use App\Product;
 use Carbon\Carbon;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -30,122 +31,54 @@ class OrderController extends Controller
         $this->mollie = Mollie::api();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function storePublic(OrderStoreRequest $request)
+    public function store(OrderStoreRequest $request)
     {
-        $event = $this->event->findOrFail($request->id);
-
         $order = $this->order;
-        $order->total_paid = $event->price * $request->tickets;
+
+        $order->name = $request->naam;
+        $order->email = $request->email;
+        $order->user_id = auth()->check() ? auth()->user()->id : null;
+        $order->country = $request->land;
+        $order->state = null;
+        $order->city = $request->woonplaats;
+        $order->postal_code = $request->postcode;
+        $order->address = $request->straat;
+        $order->address_number = $request->huisnummer;
+        $order->telephone_home = $request->telefoonnummer_vast;
+        $order->telephone_mobile = $request->telefoonnummer_mobiel;
+        $order->total_paid = number_format(Cart::total() +  env('SHIPPING_COST'), 2);
+        $order->shipping_costs = env('SHIPPING_COST');
+        $order->payment_id = null;
+        $order->payment_method = null;
+        $order->delivery_note = $request->aflevernotitie;
+        $order->note = $request->opmerking;
         $order->status = self::STATUS_PENDING;
-        $order->user_id = auth()->user()->id;
-        $order->email = auth()->user()->email;
-        $order->country = auth()->user()->country;
-        $order->state = auth()->user()->state;
-        $order->city = auth()->user()->city;
-        $order->postal_code = auth()->user()->zipcode;
-        $order->address = auth()->user()->street_name;
-        $order->address_number = auth()->user()->street_nr;
-        $order->name = auth()->user()->first_name.' '.auth()->user()->last_name;
-        $order->event_id = $event->id;
-        $order->ticket_amount = $request->tickets;
+
         $order->save();
 
-        $credit = auth()->user()->credit;
-
-        if ($credit >= $order->total_paid){
-            $newCreditTotal = $credit - $order->total_paid;
-
-            $user = auth()->user();
-            $user->credit = $newCreditTotal;
-            $user->save();
-
-            $order->update([
-                'status' => 'paid',
-                'payment_method' => 'credits',
-            ]);
-            return redirect()->route('site.order.show', $order->id);
+        $products = [];
+        foreach (Cart::content() as $i){
+            $products[] = [
+                'product_id' => $i->id,
+                'order_id' => $order->id,
+                'order_qty' => $i->qty,
+                'unit_price' => $i->options[0]->price(),
+            ];
         }
+
+        $order->productOrders()->insert($products);
 
         $payment =  $this->mollie->payments()->create([
             "amount"      => number_format($order->total_paid,2),
             "description" => "Order Nr. ". $order->id,
-            "redirectUrl" => route('site.order.show', $order->id),
+            "redirectUrl" => route('site.order.show', encrypt($order->id)),
             'webhookUrl'   => route('webhooks.mollie'),
             'metadata'    => [
                 'order_id' => $order->id,
             ],
         ]);
 
-        $order->update(['payment_id' => $payment->id]);
-
-        // redirect customer to Mollie checkout page
-        return redirect($payment->getPaymentUrl(), 303);
-    }
-
-    public function storeGroup(GroupOrderStoreRequest $request)
-    {
-        $activity = $this->event->findOrFail($request->id)->activity;
-
-        $pricePerTicket = $activity->price_per_hour / 60 * $request->duur;
-
-//        todo er moet een status bij gegeven worden om te kunnen zien dat het prive is
-        $event_id = $this->event->insertGetId([
-            'activity_id' => $activity->id,
-            'target_group' => 'iedereen',
-            'price' => $pricePerTicket,
-            'start_datetime' => $request->activiteit_datum,
-            'status' => 'private',
-            'end_datetime' => Carbon::parse($request->activiteit_datum)->addMinutes($request->duur)
-        ]);
-
-//        dd(auth()->user());
-        $order = $this->order;
-        $order->total_paid = $pricePerTicket * $request->tickets;
-        $order->status = self::STATUS_PENDING;
-        $order->user_id = auth()->user()->id;
-        $order->email = auth()->user()->email;
-        $order->country = auth()->user()->country;
-        $order->state = auth()->user()->state;
-        $order->city = auth()->user()->city;
-        $order->postal_code = auth()->user()->zipcode;
-        $order->address = auth()->user()->street_name;
-        $order->address_number = auth()->user()->street_nr;
-        $order->name = auth()->user()->first_name.' '.auth()->user()->last_name;
-        $order->event_id = $event_id;
-        $order->ticket_amount = $request->tickets;
-        $order->save();
-
-        $credit = auth()->user()->credit;
-
-        if ($credit >= $order->total_paid){
-            $newCreditTotal = $credit - $order->total_paid;
-
-            $user = auth()->user();
-            $user->credit = $newCreditTotal;
-            $user->save();
-
-            $order->update([
-                'status' => 'paid',
-                'payment_method' => 'credits',
-            ]);
-            return redirect()->route('site.order.show', $order->id);
-        }
-
-        $payment =  $this->mollie->payments()->create([
-            "amount"      => number_format($order->total_paid,2),
-            "description" => "Order Nr. ". $order->id,
-            "redirectUrl" => route('site.order.show', $order->id),
-            'webhookUrl'   => route('webhooks.mollie'),
-            'metadata'    => [
-                'order_id' => $order->id,
-            ],
-        ]);
+        session(['order' => encrypt($payment->id)]);
 
         $order->update(['payment_id' => $payment->id]);
 
@@ -161,6 +94,8 @@ class OrderController extends Controller
      */
     public function show($id)
     {
+        $id = decrypt($id);
+
         $order = $this->order->findOrFail($id, [
             'country',
             'city',
@@ -169,52 +104,53 @@ class OrderController extends Controller
             'address_number',
             'name',
             'email',
-            'telephone',
-            'ticket_amount',
+            'telephone_home',
+            'telephone_mobile',
             'total_paid',
-            'administration_cost',
             'payment_id',
+            'shipping_costs',
+            'note',
+            'delivery_note',
             'payment_method',
             'status',
+            'created_at',
             'user_id',
+            'updated_at',
         ]);
-//        dd($order->user_id);
-         if($order->user_id != auth()->user()->id){
+
+        $paymentId = session('order');
+
+        if (auth()->check() && $order->user_id !== null){
+            if($order->user_id !== (auth()->check() ? auth()->user()->id : null)){
+                abort(403);
+            }
+        }
+
+        if ($order->payment_id !== decrypt($paymentId)){
             abort(403);
         }
-//        dd($order->status );
 
-        if ($order->status == 'paid' && $order->payment_method == 'credits'){
-            Mail::to($order->email)
-                ->send(new OrderConfirmation($order));
+        $payment =  $this->mollie->payments()->get($order->payment_id);
+
+        if ($payment->isPaid())
+        {
+            if ($order->status != 'paid'){
+                Mail::to($order->email)
+                    ->send(new OrderConfirmation($order));
+            }
 
             $order->status = self::STATUS_COMPLETED;
+            $order->payment_method = $payment->method;
             $order->save();
 
-            return view('site.order.show')
-                ->with('order', $order->toArray());
-        }else{
-            $payment =  $this->mollie->payments()->get($order->payment_id);
-
-            if ($payment->isPaid())
-            {
-                if ($order->status != 'paid'){
-                    Mail::to($order->email)
-                        ->send(new OrderConfirmation($order));
-                }
-
-                $order->status = self::STATUS_COMPLETED;
-                $order->save();
-
-                return view('site.order.show')
-                    ->with('order', $order->toArray())
-                    ->with('payment', $payment);
-            } elseif (! $payment->isOpen())
-            {
-                $order->status = self::STATUS_CANCELLED;
-                $order->save();
-                abort(404);
-            }
+            return view('site.show-order')
+                ->with('order', $order->toArray())
+                ->with('payment', $payment);
+        } elseif (! $payment->isOpen())
+        {
+            $order->status = self::STATUS_CANCELLED;
+            $order->save();
+            abort(404);
         }
 
     }

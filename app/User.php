@@ -46,6 +46,38 @@ class User extends Authenticatable
         return $this->hasMany('App\Order','user_id', 'id');
     }
 
+    public function getNaamAttribute(){
+        return $this->first_name. ' '.$this->last_name;
+    }
+
+    public function getStraatAttribute(){
+        return $this->street_name;
+    }
+
+    public function getLandAttribute(){
+        return $this->country;
+    }
+
+    public function getWoonplaatsAttribute(){
+        return $this->city;
+    }
+
+    public function getHuisnummerAttribute(){
+        return $this->street_nr;
+    }
+
+    public function getTelefoonnummerMobielAttribute(){
+        return $this->phone_nr;
+    }
+
+    public function getTelefoonnummerVastAttribute(){
+        return $this->home_phone_nr;
+    }
+
+    public function getPostcodeAttribute(){
+        return $this->zipcode;
+    }
+
     /**
      * @param bool $redirect
      * @return bool|void

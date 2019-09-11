@@ -27,6 +27,7 @@ class CreateUsersTable extends Migration
             $table->string('street_name')->nullable();
             $table->string('street_nr')->nullable();
             $table->string('phone_nr')->nullable();
+            $table->string('home_phone_nr')->nullable();
             $table->boolean('admin')->default(0);
             $table->rememberToken();
             $table->softDeletes();

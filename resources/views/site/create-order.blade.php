@@ -29,81 +29,108 @@
         <div class="row justify-content-md-center">
 
             <div class="get_in_touch_contents col-12 col-sm-12 col-md-8 col-lg-8">
-                {!! Form::open(['route' => ['admin.category.store'], 'method' => 'POST', 'style' => 'width: auto !important;']) !!}
-                <h1>Get In Touch With Us!</h1>
-                <p>Fill out the form below to recieve a free and confidential.</p>
-                     <br>
+                {!! Form::model(auth()->user(), ['route' => ['site.order.store'], 'method' => 'POST', 'style' => 'width: auto !important;']) !!}
+                    <h1>Bestelling afronden</h1>
+                    <p>Vul het formulier in en druk op <b>bestelling afronden</b> om naar betalen te gaan.</p>
+                    <br>
+                    <small class="muted"><b>Alle velden met een * moeten ingevuld zijn.</b></small>
+                    <br>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('email', 'E-mail *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::email('email', null, ['class' => 'form_input'.(!$errors->has('email') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'email'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('naam', 'Naam *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('naam', null, ['class' => 'form_input'.(!$errors->has('naam') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'naam'])
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('straat', 'Straat *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('straat', null, ['class' => 'form_input'.(!$errors->has('straat') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'straat'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('Huisnummer', 'Huisnummer *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('huisnummer', null, ['class' => 'form_input'.(!$errors->has('huisnummer') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'huisnummer'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('postcode', 'Postcode *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('postcode', null, ['class' => 'form_input'.(!$errors->has('postcode') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'postcode'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('woonplaats', 'Woonplaats *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('woonplaats', null, ['class' => 'form_input'.(!$errors->has('woonplaats') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'woonplaats'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('land', 'Land *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::select('land', ['nederland' => 'nederland', 'belgie' => 'belgie'], null, ['class' => 'form_input'.(!$errors->has('land') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'land'])
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('telefoonnummer_vast', 'Telefoonnummer vast', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('telefoonnummer_vast', null, ['class' => 'form_input'.(!$errors->has('telefoonnummer_vast') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'telefoonnummer_vast'])
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('telefoonnummer_mobiel', 'Telefoonnummer mobiel *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
+                            {!! Form::text('telefoonnummer_mobiel', null, ['class' => 'form_input'.(!$errors->has('telefoonnummer_mobiel') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'telefoonnummer_mobiel'])
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('aflevernotitie', 'Aflevernotitie', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7">
 
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('email', 'E-mail', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::email('email', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
+                            {!! Form::text('aflevernotitie', null, ['class' => 'form_input'.(!$errors->has('aflevernotitie') ? '': ' is-invalid ')]) !!}
+                            @include('components.error', ['field' => 'aflevernotitie'])
                         </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Naam', 'Naam', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('email', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
+                    </div>
+                    <div class="form-group row" style="margin: 0px;">
+                        {!! Form::label('Opmerking bij bestelling', 'Opmerking bij bestelling', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
+                        <div class="col-12 col-lg-9 col-md-7 col-">
+                            {!! Form::textarea('opmerking', null, ['class' => 'form_input'.(!$errors->has('opmerking') ? '': ' is-invalid '), 'rows' => '3', 'style' => 'height: auto !important;']) !!}
+                            @include('components.error', ['field' => 'opmerking'])
                         </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Straat', 'Straat', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('email', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Huisnummer', 'Huisnummer', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('email', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Postcode', 'Postcode', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Postcode', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Woonplaats', 'Woonplaats', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Woonplaats', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Land', 'Land', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Land', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Telefoonnummer vast', 'Telefoonnummer vast', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Land', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Telefoonnummer mobiel', 'Telefoonnummer mobiel', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Land', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Aflevernotitie', 'Aflevernotitie', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::text('Land', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            {!! Form::label('Opmerking bij bestelling', 'Opmerking bij bestelling', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                            {!! Form::textarea('Land', null, ['class' => 'col-12 col-lg-9 col-md-7 form_input'.(!$errors->has('value') ? '': ' is-invalid '), 'rows' => '3', 'style' => 'height: auto !important;']) !!}
-                            @include('components.error', ['field' => 'email'])
-                        </div>
-                        <div class="form-group row" style="margin: 0px;">
-                            <div class="col-12 col-lg-3 col-md-5 "></div>
-                            <div class="col-12 col-lg-9 col-md-7 ">
-                                <div class="form-check form-check-inline float-right">
-                                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" style="margin-left: -10px;">
-                                    <label class="form-check-label font-weight-bold" for="defaultCheck1">
-                                        Gaat u akkoort met de algemene voorwaarden en privacy statement van site.nl
-                                    </label>
-                                </div>
+                    </div>
+                    <div class="form-check row" style="margin: 0px;">
+                        <div class="col-12 col-lg-9 col-md-7 float-right" style="padding-left: 30px; padding-top: 20px;">
+                            <div class="form-check form-check-inline float-right {!! !$errors->has('algemene_voorwaarden') ? '': ' is-invalid ' !!}">
+                                <input class="form-check-input form-check-label" type="checkbox" name="algemene_voorwaarden" id="algemeneVoorwaarden" style="margin-left: -10px;">
+                                <label class="form-check-label font-weight-bold" for="algemeneVoorwaarden">
+                                    Gaat u akkoort met de <a href="{!! route('site.terms') !!}">algemene voorwaarden</a> en
+                                    <a href="{!! route('site.privacy') !!}">privacy statement</a> van site.nl
+                                    @include('components.error', ['field' => 'algemene_voorwaarden'])
+                                </label>
                             </div>
-                            @include('components.error', ['field' => 'email'])
                         </div>
-
-                    <button id="review_submit" type="submit" class="float-right red_button newsletter_submit_btn trans_300" style="padding: 20px !important; width: auto !important;" value="Submit">bestelling afronden</button>
-
+                    </div>
+                    <div class="col-12">
+                        <button id="review_submit" type="submit" class="float-right red_button newsletter_submit_btn trans_300" style="padding: 20px !important; width: 100% !important;" value="Submit">bestelling afronden</button>
+                    </div>
                 {!! Form::close() !!}
             </div>
 
@@ -117,7 +144,20 @@
     <link rel="stylesheet" type="text/css" href="/styles/contact_responsive.css">
 
 <style>
+    .form-check.is-invalid{
+       color: #dc3545!important;
+    }
+    .form_input.is-invalid{
+       border-color: #dc3545!important;
+    }
 
+    .form_input{
+        margin-bottom: 0px;
+        margin-top: 20px;
+    }
+    .col-form-label {
+        margin-top: 15px !important;
+    }
 
     .benefit
     {

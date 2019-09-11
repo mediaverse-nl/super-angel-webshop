@@ -12,12 +12,13 @@
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Illuminate\Http\Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:api')->get('/user', function (Illuminate\Http\Request $request) {
+//    return $request->user();
+//});
 
 //text editor
-Route::post('/text-editor-{id}', function(App\Http\Requests\Api\Admin\TextUpdateRequest $request, $id) {
+Route::post('/text-editor-{id}', function(App\Http\Requests\Api\Admin\TextUpdateRequest $request, $id)
+{
     $text = \App\Text::findOrFail($id);
 
     $text->update(['text' => $request->text]);

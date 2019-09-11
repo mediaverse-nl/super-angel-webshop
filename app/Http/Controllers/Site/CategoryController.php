@@ -99,12 +99,7 @@ class CategoryController extends Controller
             ->groupBy('properties.value')
             ->get();
 
-        $test= $category
-            ->with(['products.productDetails.detail.property' => function($query){
-                $query->groupBy('value');
-            }])->get();
-
-        $products = $this->product
+        $products = $category->products()
 //            ->whereHas('activity', function ($q) use ($category, $filter) {
 //                $q->where('category_id', '=', $category->id);
 //

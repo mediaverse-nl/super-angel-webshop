@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Colo Shop</title>
+    {{--<title>Colo Shop</title>--}}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Colo Shop Template">
@@ -13,6 +13,37 @@
     <link rel="stylesheet" type="text/css" href="/plugins/OwlCarousel2-2.2.1/animate.css">
     <link rel="stylesheet" type="text/css" href="/plugins/jquery-ui-1.12.1.custom/jquery-ui.css">
 
+
+    <!-- seo -->
+    {!! SEO::generate() !!}
+
+    @if(Auth::check() && Auth::user()->admin == 1)
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.css" rel="stylesheet">
+        <style>
+            .note-air-popover{
+                background-color: #e83e8c;
+                width: 380px;
+                max-width: 380px;
+                min-width: 200px;
+                border-radius: 0px !important;
+            }
+            .popover-content.note-children-container{
+                background-color: #cecece;
+                color: #eeeeee;
+            }
+            input[type="button"]
+            {
+                width:120px;
+                height:60px;
+                margin-left:35px;
+                display:block;
+                background-color:gray;
+                color:white;
+                border: none;
+                outline:none;
+            }
+        </style>
+    @endif
 
     @stack('css')
 
@@ -33,8 +64,11 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="newsletter_text d-flex flex-column justify-content-center align-items-lg-start align-items-md-center text-center">
-                        <h4>Newsletter</h4>
-                        <p>Subscribe to our newsletter and get 20% off your first purchase</p>
+                        {{--<h4>Newsletter</h4>--}}
+                        {{--<p>Subscribe to our newsletter and get 20% off your first purchase</p>--}}
+
+                        <h4>Nieuwsbrief</h4>
+                        <p>Abonneer u op onze nieuwsbrief en ontvang alle nieuwsberichten</p>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -51,6 +85,9 @@
 
     <!-- Footer -->
     @include('includes.footer')
+
+    @include('cookieConsent::index')
+
 </div>
 
 <script src="/js/jquery-3.2.1.min.js"></script>
@@ -60,6 +97,10 @@
 <script src="/plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
 <script src="/plugins/easing/easing.js"></script>
 <script src="/plugins/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+
+@if(Auth::check() && Auth::user()->admin == 1)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.js"></script>
+@endif
 
 @stack('js')
 

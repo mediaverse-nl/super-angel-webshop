@@ -28,7 +28,7 @@ class PageController extends Controller
             ->twitter()
             ->setSite('@username');
 
-        return view('site.page.terms');
+        return view('site.terms');
     }
 
     public function policy()
@@ -47,7 +47,7 @@ class PageController extends Controller
             ->twitter()
             ->setSite('@username');
 
-        return view('site.page.policy');
+        return view('site.policy');
     }
 
     public function about()

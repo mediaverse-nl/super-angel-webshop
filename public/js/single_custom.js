@@ -218,6 +218,7 @@ jQuery(document).ready(function($)
 			{
 				var x = parseInt(value.text());
 				value.text(x + 1);
+                addValueToInput(value);
 			});
 
 			minus.on('click', function()
@@ -226,8 +227,19 @@ jQuery(document).ready(function($)
 				if(x > 1)
 				{
 					value.text(x - 1);
+                    addValueToInput(value)
 				}
 			});
+
+			function addValueToInput(value) {
+                var qty = value.text();
+
+                // console.log(qty);
+
+				var inputQty = $('#qtyInput').val(qty);
+
+                // console.log(inputQty.val());
+            }
 		}
 	}
 
@@ -255,12 +267,18 @@ jQuery(document).ready(function($)
 					{
 						$(this).removeClass('fa-star');
 						$(this).addClass('fa-star-o');
+						console.log(i);
+
 					});
 					for(var x = 0; x <= i; x++)
 					{
 						$(stars[x]).find('i').removeClass('fa-star-o');
 						$(stars[x]).find('i').addClass('fa-star');
 					};
+
+                    var rating = i + 1;
+
+                    var inputRating = $('#ratingInput').val(rating);
 				});
 			});
 		}

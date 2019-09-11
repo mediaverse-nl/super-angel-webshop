@@ -308,6 +308,8 @@ jQuery(document).ready(function($)
 
 	*/
 
+    var filters = {};
+
     function initIsotopeFiltering()
     {
     	var sortTypes = $('.type_sorting_btn');
@@ -317,6 +319,7 @@ jQuery(document).ready(function($)
 
     	if($('.product-grid').length)
     	{
+
     		$('.product-grid').isotope({
     			itemSelector: '.product-item',
 	            getSortData: {
@@ -356,21 +359,36 @@ jQuery(document).ready(function($)
 	        		$('.num_sorting_text').text($(this).text());
     				$('.product-grid').isotope({filter: numFilter });
 	        	});
-	        });	
+	        });
 
 	        // Filter based on the price range slider
 	        filterButton.on('click', function()
 	        {
 	        	$('.product-grid').isotope({
-		            filter: function()
-		            {
-		            	var priceRange = $('#amount').val();
-			        	var priceMin = parseFloat(priceRange.split('-')[0].replace('$', ''));
-			        	var priceMax = parseFloat(priceRange.split('-')[1].replace('$', ''));
-			        	var itemPrice = $(this).find('.product_price').clone().children().remove().end().text().replace( '€', '' );
+                    filter: function()
+                    {
+                        var priceRange = $('#amount').val();
+                        var priceMin = parseFloat(priceRange.split('-')[0].replace('$', ''));
+                        var priceMax = parseFloat(priceRange.split('-')[1].replace('$', ''));
+                        var itemPrice = $(this).find('.product_price').clone().children().remove().end().text().replace( '€', '' );
 
-			        	return (itemPrice > priceMin) && (itemPrice < priceMax);
-		            },
+                        // var yourArray = [];
+                        // $("#detail:checked").each(function(){
+                        //     yourArray.push($(this).val());
+                        // });
+                        //
+                        // console.log(yourArray);
+
+                        // var propertiesRange = $('#detail');
+                        //
+                        // console.log(propertiesRange);
+                        //
+                        // var productProperties = $(this).find('.product_properties').clone().children().remove().end().text().split(",").map(i=>i.trim());
+                        //
+                        // console.log(productProperties);
+
+                        return (itemPrice > priceMin) && (itemPrice < priceMax);
+                    },
 		            animationOptions: {
 		                duration: 750,
 		                easing: 'linear',
@@ -378,102 +396,7 @@ jQuery(document).ready(function($)
 		            }
 		        });
 
-                $('.product-grid').isotope({
-                    filter: function () {
-
-
-                        var filters = [];
-                        //        // get checked checkboxes values
-                        console.log();
-
-                        $('.checkboxes li.active').each(function(){
-
-						   	console.log('item');
-							console.log($( this ).attr( "isotope-checkboxes" ));
-						   	console.log('');
-
-						   	filters.push( this );
-						});
-
-					   console.log('');
-					   console.log('filter:');
-					   console.log(filters);
-					   console.log(filters.join(', '));
-					   console.log('end filter');
-
-					   // ['.red', '.blue'] -> '.red, .blue'
-					   return filters;
-                    },
-                    animationOptions: {
-                        duration: 750,
-                        easing: 'linear',
-                        queue: false
-                    }
-                });
-
-
-	        	// $('.product-grid').isotope({
-		        //     filter: function()
-		        //     {
-                 //        var filters = [];
-                 //        // get checked checkboxes values
-                 //        $('.checkboxes').filter('li.active').each(function(){
-                //
-                 //            console.log('item');
-                 //        	console.log(this.val());
-                 //            console.log('');
-                //
-                 //            filters.push( this );
-                 //        });
-                 //        console.log('');
-                 //        console.log('filter:');
-                 //        console.log(filters);
-                 //        console.log('end filter');
-                //
-                 //        // ['.red', '.blue'] -> '.red, .blue'
-                 //        return filters.join(', ');
-                 //        // $container.isotope({ filter: filters });
-                //
-                 //        // var priceRange = $('#amount').val();
-			     //    	// var priceMin = parseFloat(priceRange.split('-')[0].replace('$', ''));
-			     //    	// var priceMax = parseFloat(priceRange.split('-')[1].replace('$', ''));
-			     //    	// var itemPrice = $(this).find('.product_price').clone().children().remove().end().text().replace( '€', '' );
-                 //        //
-			     //    	// return (itemPrice > priceMin) && (itemPrice < priceMax);
-		        //     },
-		        //     animationOptions: {
-		        //         duration: 750,
-		        //         easing: 'linear',
-		        //         queue: false
-		        //     }
-		        // });
-
-
-
-
-                // var $container = $('.product-grid'),
-                //     $checkboxes = $('.checkboxes');
-                //
-                // console.log('click');
-                // console.log($container, $checkboxes);
-                //
-                // $container.isotope({
-                //     itemSelector: '.product-item'
-                // });
-                //
-                // $checkboxes.change(function(){
-                //
-                // });
-
-
             });
-
-
-            //
-            //
-
-            //
-            //
     	}
     }
 
@@ -546,4 +469,125 @@ jQuery(document).ready(function($)
     		}
     	};
     }
+
+    // do stuff when checkbox change
+    $('.sidebar').on('change', function( jQEvent ) {
+
+    	console.log($( jQEvent.target ));
+
+        var $checkbox = $( jQEvent.target );
+
+        manageCheckbox( $checkbox );
+
+        var comboFilter = getComboFilter( filters );
+
+        $('.product-grid').isotope({ filter: comboFilter });
+
+        $('.product-grid').isotope( 'on', 'layoutComplete', function( isoInstance, laidOutItems ) {
+            updateCount();
+        });
+
+    });
+
+    $.expr[':'].hasClassStartingWith = function(el, i, selector) {
+        var re = new RegExp("\\b" + selector[3]);
+        return re.test(el.className);
+    }
+
+    function updateCount() {
+        var numItems = 0;
+        $('.count').each(function( index ) {
+            if ( $(this).prev('input').hasClass('all') ) {
+                numItems = $('.product-item').length;
+                $(this).html(numItems);
+            }
+            else {
+                var itemClass = $(this).prev('input').val().substring(1);
+                var itemSelector = ".product-grid div:hasClassStartingWith('" + itemClass + "')";
+                numItems = $(itemSelector).not(":hidden").length;
+                $(this).html(numItems);
+            }
+        });
+    }
+
+    function getComboFilter( filters ) {
+        var i = 0;
+        var comboFilters = [];
+        var message = [];
+
+        for ( var prop in filters ) {
+            message.push( filters[ prop ].join(' ') );
+            var filterGroup = filters[ prop ];
+            // skip to next filter group if it doesn't have any values
+            if ( !filterGroup.length ) {
+                continue;
+            }
+            if ( i === 0 ) {
+                // copy to new array
+                comboFilters = filterGroup.slice(0);
+            } else {
+                var filterSelectors = [];
+                // copy to fresh array
+                var groupCombo = comboFilters.slice(0); // [ A, B ]
+                // merge filter Groups
+                for (var k=0, len3 = filterGroup.length; k < len3; k++) {
+                    for (var j=0, len2 = groupCombo.length; j < len2; j++) {
+                        filterSelectors.push( groupCombo[j] + filterGroup[k] ); // [ 1, 2 ]
+                    }
+
+                }
+                // apply filter selectors to combo filters for next group
+                comboFilters = filterSelectors;
+            }
+            i++;
+        }
+
+        var comboFilter = comboFilters.join(', ');
+        return comboFilter;
+    }
+
+    function manageCheckbox( $checkbox ) {
+        var checkbox = $checkbox[0];
+
+        var group = $checkbox.parents('fieldset').attr('data-group');
+        // create array for filter group, if not there yet
+
+		console.log(group);
+        var filterGroup = filters[ group ];
+        if ( !filterGroup ) {
+            filterGroup = filters[ group ] = [];
+        }
+
+        var isAll = $checkbox.hasClass('all');
+        // reset filter group if the all box was checked
+        if ( isAll ) {
+            delete filters[ group ];
+            if ( !checkbox.checked ) {
+                checkbox.checked = 'checked';
+            }
+        }
+        // index of
+        var index = $.inArray( checkbox.value, filterGroup );
+
+        if ( checkbox.checked ) {
+            var selector = isAll ? 'input' : 'input.all';
+            $checkbox.siblings( selector ).removeAttr('checked');
+
+            if ( !isAll && index === -1 ) {
+                // add filter to group
+                filters[ group ].push( checkbox.value );
+            }
+
+        } else if ( !isAll ) {
+            // remove filter from group
+            filters[ group ].splice( index, 1 );
+            // if unchecked the last box, check the all
+            if ( !$checkbox.siblings('[checked]').length ) {
+                $checkbox.siblings('input.all').attr('checked', 'checked');
+            }
+        }
+
+    }
+
+    updateCount();
 });

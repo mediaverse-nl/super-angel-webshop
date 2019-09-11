@@ -20,6 +20,7 @@ class CreateProductDetailsTable extends Migration
             $table->integer('detail_id')->nullable()->unsigned();
             $table->foreign('detail_id')->references('id')->on('details')->onDelete('cascade');
             $table->timestamps();
+            $table->unique(['product_id', 'detail_id']);
         });
     }
 

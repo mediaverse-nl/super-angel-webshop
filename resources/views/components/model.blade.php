@@ -1,12 +1,12 @@
 <!-- Button trigger modal -->
-<a class="{!! $btnClass !!}" data-toggle="tooltip" data-placement="top" title="{!! '' or '' !!}" style="color: #FFFFFF;">
-    <div data-toggle="modal" data-target="#{!! $id !!}" data-placement="top">
-        <i class="{!! !empty($btnIcon) ? $btnIcon : '' !!}" style="color: #FFFFFF !important;" ></i>
+<div data-toggle="modal" data-target="#{!! $id !!}" data-placement="top" style="display: inline-block;" class="{!! $btnClass !!}">
+    <a class="" data-toggle="tooltip" data-placement="top" title="{!! '' or '' !!}" style="color: #FFFFFF;">
+        <i class="{!! !empty($btnIcon) ? $btnIcon : '' !!}" style="color: #FFFFFF;" ></i>
         @if(!empty($btnTitle))
              {!! $btnTitle !!}
         @endif
-     </div>
- </a>
+    </a>
+ </div>
 
 <!-- Modal -->
 <div class="modal fade" id="{!! $id !!}" tabindex="-1" role="dialog" aria-labelledby="{!! $id !!}Label" aria-hidden="true">
@@ -20,7 +20,7 @@
             </div>
 {{--            @if(!str_contains($title, 'Terugboeken'))--}}
                 <div class="modal-body">
-                    {!! $description or ''!!}
+                    {!! !empty($description) ? $description : ''!!}
                 </div>
             {{--@endif--}}
             @if(!str_contains($title, 'Terugboeken'))

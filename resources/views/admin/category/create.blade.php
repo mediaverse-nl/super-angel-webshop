@@ -17,6 +17,21 @@
                             @include('components.error', ['field' => 'value'])
                         </div>
 
+                        <div class="form-group">
+                            <label for="">Images</label>
+                            <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <a id="lfm" data-input="productThumbnail" data-preview="imgHolder" class="btn btn-primary text-white" style="border-radius: 0px !important;">
+                                            <i class="fa fa-picture-o"></i> Choose
+                                        </a>
+                                    </span>
+                                <input id="productThumbnail" class="form-control" type="text" disabled
+                                       value="">
+                                {!! Form::hidden('image', null, ['id' => 'productThumbnailCopy', 'class' => 'form-control'.(!$errors->has('images') ? '': ' is-invalid ')]) !!}
+                            </div>
+                            <div id="imgHolder" style="margin-top:15px;max-height:100px;"></div>
+                        </div>
+
                         @component('components.model', [
                             'id' => 'CreateCategory',
                             'title' => 'Create entry ',
@@ -37,3 +52,22 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
+    <script>
+        var route_prefix = "{!! url(config('lfm.url_prefix')) !!}";
+
+        $('#lfm').filemanager('file', {prefix: route_prefix});
+
+        function getImagePath(el) {
+            $('#productThumbnailCopy').val(el);
+        }
+
+        getImagePath($('#productThumbnail').val());
+
+        $('#productThumbnail').change(function() {
+            getImagePath($(this).val());
+        });
+    </script>
+@endpush

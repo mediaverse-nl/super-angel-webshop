@@ -20,6 +20,7 @@ class CreateCategoryTable extends Migration
             $table->foreign('category_id')->references('id')->on('category');
             $table->integer('order');
             $table->string('value');
+            $table->string('image');
             $table->unique(['value', 'category_id']);
             $table->softDeletes();
         });

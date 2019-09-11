@@ -34,6 +34,32 @@ class Category extends Model
         return $this->hasMany('App\Product','category_id', 'id');
     }
 
+    public function images($amount = '*')
+    {
+        $images = [];
+
+        if(!empty($this->image)){
+            $i = 1;
+            foreach (explode(',', $this->image) as $image) {
+                if ($amount == '*'){
+                    $images[] = $image;
+                }elseif ($i <= $amount){
+                    $images[] = $image;
+                }
+                $i++;
+            }
+        }else{
+            $images = null;
+        }
+
+        return $images;
+    }
+
+    public function thumbnail()
+    {
+        return $this->images(1)[0];
+    }
+
     public function scopeParents($query)
     {
         $query->where('category_id', '=', null);

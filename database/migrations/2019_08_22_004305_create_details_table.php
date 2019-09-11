@@ -15,12 +15,11 @@ class CreateDetailsTable extends Migration
     {
         Schema::create('details', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('property_id')->nullable()->unsigned();
+            $table->integer('property_id')->unsigned();
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
-
             $table->string('value');
-//            $table->unique(['value', 'property_id']);
             $table->timestamps();
+            $table->unique(['value', 'property_id']);
         });
     }
 

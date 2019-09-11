@@ -48,6 +48,7 @@ class CategoryController extends Controller
             ->withTrashed()
             ->findOrFail($id);
 
+        $category->image = $request->image;
         $category->value = $request->value;
 
         $category->save();
@@ -61,6 +62,7 @@ class CategoryController extends Controller
         $category = new Category;
 
         $category->value = $request->value;
+        $category->image = $request->image;
         $category->order = 0;
 
         $category->save();
