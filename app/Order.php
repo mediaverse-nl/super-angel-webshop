@@ -11,7 +11,7 @@ class Order extends Model
 
     public $timestamps = true;
 
-    protected $fillable = ['payment_id', 'status', 'payment_method'];
+    protected $fillable = ['*'];
 
     protected $dates = ['created_at', 'updated_at'];
 

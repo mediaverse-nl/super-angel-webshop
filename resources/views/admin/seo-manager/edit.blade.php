@@ -13,6 +13,8 @@
                         {!! Form::hidden('id', $seo->id) !!}
                         <div class="form-group">
                             {!! Form::label('route_name', 'Page name') !!}
+
+                            {!! Form::text('url', route($seo->route_name), ['class' => 'form-control'.(!$errors->has('title') ? '': ' is-invalid '), 'disabled']) !!} <br>
                             {!! Form::text('route_name', null, ['class' => 'form-control'.(!$errors->has('title') ? '': ' is-invalid '), 'disabled']) !!}
                         </div>
 

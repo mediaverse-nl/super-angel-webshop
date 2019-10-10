@@ -12,8 +12,8 @@
             <th>id</th>
             <th>category</th>
             <th>title</th>
-            <th>stock</th>
             <th>price</th>
+            <th>stock</th>
              <th class="no-sort"></th>
         @endslot
         @slot('table')
@@ -22,8 +22,11 @@
                     <td>{!! $product->id !!}</td>
                     <td>{!! $product->category ? $product->category->value : '' !!}</td>
                     <td>{!! $product->title !!}</td>
-                    <td>{!! $product->stock !!}</td>
-                    <td>{!! $product->productPrice !!}</td>
+                    <td>&euro; {!! number_format($product->default_price, 2) !!}</td>
+                    <td>
+                        {!! $product->productTypes->sum('stock') == 0 ? 0 : $product->productTypes->sum('stock') !!} in stock
+                        of {!! $product->productTypes->count() !!} variant
+                    </td>
                     <td>
                         @component('components.model', [
                                'id' => 'userTableBtn'.$product->id,

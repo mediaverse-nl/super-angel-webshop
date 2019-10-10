@@ -372,6 +372,8 @@ jQuery(document).ready(function($)
                         var priceMax = parseFloat(priceRange.split('-')[1].replace('$', ''));
                         var itemPrice = $(this).find('.product_price').clone().children().remove().end().text().replace( '€', '' );
 
+                        // console.log();
+
                         // var yourArray = [];
                         // $("#detail:checked").each(function(){
                         //     yourArray.push($(this).val());

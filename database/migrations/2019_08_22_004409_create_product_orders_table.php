@@ -21,6 +21,7 @@ class CreateProductOrdersTable extends Migration
             $table->foreign('order_id')->references('id')->on('order');
             $table->bigInteger('order_qty');
             $table->float('unit_price', 8, 2);
+            $table->text('data');
             $table->timestamps();
         });
     }

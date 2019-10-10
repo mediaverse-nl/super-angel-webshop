@@ -2,7 +2,7 @@
     <input type="hidden" name="row" value="{{$item->rowId}}">
     <input type="hidden" name="qty" value="{{$item->qty - 1}}">
     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-    <button type="submit" class="btn btn-fefault btn-xs add-to-cart" style=""
+    <button type="submit" class="btn btn-fefault btn-xs add-to-cart" style="background: #f3f3f3;"
             {{$item->qty != 1 ? : 'disabled'}}>
         <i class="fa fa-minus"></i>
     </button>

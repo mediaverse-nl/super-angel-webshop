@@ -68,10 +68,10 @@
                         </div>
                     @endif
                     @if( $product->discount)
-                        <div class="original_price">{!! $product->productPrice !!}</div>
-                        <div class="product_price">&euro;{!! $product->price() !!}</div>
+                        <div class="original_price">{!! number_format($product->default_price, 2) !!}</div>
+                        <div class="product_price">&euro; {!! number_format($product->default_price - $product->discount, 2)  !!}</div>
                     @else
-                        <div class="product_price">{!! $product->productPrice !!}</div>
+                        <div class="product_price">&euro; {!! number_format($product->default_price, 2)  !!}</div>
                     @endif
                     <ul class="star_rating" style="margin-right: 10px;">
                         @for($i = 1; $i <= ceil($product->reviews->avg('rating') ); $i++)
@@ -83,17 +83,49 @@
                     </ul>
                     <small><b>{!! $product->reviews->avg('rating') == null ?  'geen reviews' :   $product->reviews->avg('rating').' / 5'!!} </b></small>
 
-
                     <br>
                     <br>
                     <table>
-                    @foreach($product->productDetails as $d)
+                    @php
+
+
+                        $filterArray = [];
+
+                        foreach ($product->productTypes as $type){
+                            foreach ($type->productVariants as $productVariant) {
+                               $filterArray[$productVariant->detail->property->value][] = $productVariant->detail->value;
+                            }
+                        }
+
+                        foreach($filterArray as $k => $v){
+                            $unique= array_values(array_unique($v));
+                            $filterArray[$k]=$unique;
+                        }
+                    @endphp
+
+
+
+                    @foreach($filterArray as $k => $v)
                         <tr>
-                            <td style="padding: 2px 5px;"><b>{!! $d->detail->property->value !!}:</b></td>
-                            <td>{!! $d->detail->value !!}</td>
+                            <td style="padding: 2px 0px;">
+                                <b style="margin-top: 10px;">{!! $k !!}:</b><br>
+                                <select name="filter[]" id="filter-{!! $k !!}" onchange="disableInputs({!! $loop->index !!})" class="filterInput form_input input_name" {!! $loop->index == 0 ? '' : 'disabled' !!} style="margin: 0px !important; height: 35px;">
+                                    {{--@if($loop->index == 0)--}}
+                                        <option value="">-- select --</option>
+                                    {{--@endif--}}
+                                    {{--@foreach($v as $d)--}}
+                                        {{--<option value="{!! $d !!}">{!! $d !!}</option>--}}
+                                    {{--@endforeach--}}
+
+                                </select>
+                            </td>
                         </tr>
                     @endforeach
-                    </table> 
+                    </table>
+                    @if($errors->first('product_id'))
+                        <p><span class="text-danger">opties verplicht</span></p>
+                    @endif
+
                     <div class="quantity d-flex flex-column flex-sm-row align-items-sm-center">
                         <span>Aantal:</span>
 
@@ -106,12 +138,11 @@
                         @if($product->stock >= 1)
                             {!! Form::model($product, array('route' => 'site.cart.add', 'method' => 'post')) !!}
                                 <input type="hidden" value="1" name="qty" id="qtyInput">
-                                <input type="hidden" value="{{$product->id}}" name="product_id" class="pull-left">
+                                <input type="hidden" value="" name="product_id" class="pull-left" id="productId" required>
                                 <button class="red_button add_to_cart_button" style="color: #FFFFFF; border: none !important;">winkelmandje</button>
                             {{ Form::close() }}
                         @else
-                            <button class="red_button add_to_cart_button disabled" style="color: #FFFFFF; border: none !important;">winkelmandje</button>
-
+                            <button class="red_button add_to_cart_button disabled" style="opacity: .5; color: #FFFFFF; border: none !important;">uitverkocht</button>
                         @endif
 
                         {{--<div class="red_button add_to_cart_button"><a href="#">add to cart</a></div>--}}
@@ -134,7 +165,7 @@
                         <ul class="tabs d-flex flex-sm-row flex-column align-items-left align-items-md-center justify-content-center">
                             {{--<li class="tab active" data-active-tab="tab_1"><span>Description</span></li>--}}
                             <li class="tab " data-active-tab="tab_2"><span>Product Informatie</span></li>
-                            <li class="tab active" data-active-tab="tab_3"><span>Reviews (2)</span></li>
+                            <li class="tab active" data-active-tab="tab_3"><span>Reviews ({!! $product->reviews->count() !!})</span></li>
                         </ul>
                     </div>
                 </div>
@@ -172,6 +203,9 @@
                                 </div>
 
                                 <!-- User Review -->
+                                @if($product->reviews->count() == 0)
+                                    Er zijn geen reviews van dit product beschikbaar, wees de eerste en laat je review achter.
+                                @endif
 
                                 @foreach($product->reviews()->orderBy('id')->get() as $r)
                                     <div class="user_review_container d-flex flex-column flex-sm-row">
@@ -202,7 +236,8 @@
 
                             <div class="col-lg-6 add_review_col">
 
-                                <div class="add_review">
+                                <div class="add_review" style="border-left: 1px solid #ebebeb;
+    padding-left: 30px; padding-top: 10px; padding-bottom: 10px;">
 
                                     @if(auth()->check())
                                     {!! Form::open(array('route' => 'site.review.store', 'method' => 'POST', 'id' => 'review_form')) !!}
@@ -239,7 +274,7 @@
 
                             @else
                                 <div>
-                                    <h1>Je moet ingelogd zijn om een review te schrijven</h1>
+                                    <h1>Log in om een revieuw achter te laten</h1>
                                     <br>
                                 </div>
                                 <div class="">
@@ -271,6 +306,76 @@
 @push('js')
     <script src="/js/single_custom.js"></script>
     <script>
+
+        getFilterResponse('');
+
+        function disableInputs(selectedIndex) {
+            $(".filterInput").each(function(index) {
+                if (index > selectedIndex){
+                    $(this).prop('disabled', true);
+                    $(this).find('option:selected').prop("selected", false);
+                }
+            });
+        }
+
+        function getFilterResponse(selectedOptions) {
+            $.get("/test-me/{!!  $product->id !!}?data=" + selectedOptions,
+                function(data, status){
+                    var el = $('.filterInput option:selected[value=""]').parent().attr('id');
+
+                    if(el){
+                        var selectedArray = data.filter_options[el.replace('filter-', '')];
+
+                        $("#"+el).children('option:not(:first)').remove();
+
+                        $.each(selectedArray, function(key, value) {
+                            $("#"+el).append($('<option '+ (value == 0 ? "disabled" : "") +'></option>')
+                                .attr("value", key)
+                                .text(key + (value == 0 ? " - uitverkocht" : "")));
+                        });
+
+                        $('#productId').val(null);
+                    }else {
+                        if (data.product_variant.product.discount != 0){
+                            $('.original_price').text( '€ '+data.product_variant.price.toFixed( 2 ));
+                        }
+                        $('.product_price').text( '€ '+data.product_variant.selling_price.toFixed( 2 ));
+                        $('#productId').val(data.product_id);
+                    }
+
+                    console.log(data);
+                }
+            );
+        }
+
+        $(document).ready(function(){
+            $('.filterInput').change(function() {
+
+                var value = $(this).val();
+
+                $(".filterInput").each(function(index) {
+                    if ($(this).val() == value){
+                        $(".filterInput").eq(index + 1).prop('disabled', false);
+                    }
+                });
+
+                var selectedOptions = "";
+
+                $(".filterInput > option:selected").each(function(index) {
+                    var value = $(this).val();
+
+                    if (value !== ""){
+                        if (index == 0){
+                            selectedOptions += "";
+                        }else {
+                            selectedOptions += ",";
+                        }
+                        selectedOptions += "" + value;
+                    }
+                });
+                getFilterResponse(selectedOptions);
+            });
+        });
 
     </script>
 @endpush

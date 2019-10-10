@@ -23,7 +23,6 @@ class ProductController extends Controller
         $product = $this->product->findOrFail($id);
 
         if ($product->urlTitle !== $title){
-//            dd($product->urlTitle, $title);
             return redirect()->route('site.product.show', [$product->urlTitle, $product->id]);
         }
 
@@ -38,9 +37,9 @@ class ProductController extends Controller
             ->setUrl(url()->current())
             ->addProperty('type', 'website');
         //twitter
-        $this->seo()
-            ->twitter()
-            ->setSite('@username');
+//        $this->seo()
+//            ->twitter()
+//            ->setSite('@username');
 
         return view('site.product', compact('product'));
     }

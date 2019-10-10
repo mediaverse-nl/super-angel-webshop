@@ -49,7 +49,7 @@
                                         </div>
                                     </li>
                                 @endforeach
-                                <li class="list-group-item">
+                                <li class="list-group-item" style="padding: .75rem 0rem;">
                                     {!! Form::open(['url' => route('admin.detail.store-detail'), 'method' => 'POST']) !!}
                                     <div class="row">
                                         <div class="col-8">
@@ -61,7 +61,7 @@
                                         </div>
                                         <div class="col-4">
                                             <div style="height:100%; position:relative;">
-                                                {!! Form::submit('add', ['class' => 'btn btn-success btn-block','style' => 'position:absolute; bottom:17px;']) !!}
+                                                {!! Form::submit("add", ['class' => 'btn btn-success btn-block','style' => 'position:absolute; bottom:17px;']) !!}
 
                                             </div>
                                         </div>
@@ -103,6 +103,16 @@
             border-left: 0;
             border-radius: 0;
         }
+
+
+        .list-group > .btn-group-sm > .btn, .btn-sm {
+            padding: .03rem .4rem !important;
+            margin-bottom: 7px;
+        }
+        .list-group {
+            list-style: none !important;
+        }
+
     </style>
 @endpush
 

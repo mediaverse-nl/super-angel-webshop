@@ -21,6 +21,6 @@ class Detail extends Model
 
     public function productDetails()
     {
-        return $this->hasMany('App\ProductDetail','property_id', 'id');
+        return $this->hasMany('App\ProductDetail','property_id', 'id')->orderBy('value');
     }
 }

@@ -29,6 +29,11 @@ class Product extends Model
         return $this->hasMany('App\ProductDetail', 'product_id', 'id');
     }
 
+    public function productTypes()
+    {
+        return $this->hasMany('App\ProductType', 'product_id', 'id');
+    }
+
     public function productOrders()
     {
         return $this->hasMany('App\ProductOrder', 'product_id', 'id');
@@ -39,23 +44,30 @@ class Product extends Model
         return $this->belongsTo('App\Category', 'category_id', 'id');
     }
 
-    public function taxPrice()
+    public function productFilter()
     {
-        $bedrag_inc = $this->price();
-        $btw = 21; // 0 - 6 - 19
-
-//        echo 'Bedrag inclusief: '.$bedrag_inc .'<br>';
-
-        return number_format($bedrag_inc/(100+$btw)*100, 2);
-//        echo 'Bedrag exclusief: '.$bedrag_ex.'<br>'; //totaal
-
-//        $bedrag_ex = round($bedrag_ex, 2); //totaal afgerond
-//        echo 'Eindbedrag: '.$bedrag_ex.'<br>';
+        return $this->hasMany('App\ProductFilter','product_id', 'id');
     }
 
-    public function price()
+    public function getStockAttribute()
     {
-        return number_format($this->price - $this->discount, 2);
+        return $this->productTypes()->sum('stock');
+    }
+
+    public function hasOneProductType()
+    {
+        $productTypes = $this->productTypes();
+
+        if ($productTypes->first()){
+//            dd($productTypes->first()->productVariants);
+
+            if ($productTypes->first()->productVariants->count() == 0){
+               return true;
+            }
+        }
+
+
+        return false;
     }
 
     public function isNewProduct()
@@ -121,16 +133,6 @@ class Product extends Model
 //        }
 
 //        return str_replace(' ', '-',  rtrim($this->title));
-    }
-
-    public function getProductPriceAttribute()
-    {
-        return '&euro; '.number_format($this->price, 2);
-    }
-
-    public function getDiscountPriceAttribute()
-    {
-        return '&euro; '.number_format($this->price(), 2);
     }
 
     public function getProductNameAttribute()

@@ -32,7 +32,7 @@ class PdfController extends Controller
 
         $pdf = $this->pdf->loadView('pdf.invoice', ['order' => $order]);
 
-        return $pdf->download('hailsuit-invoice-'.$order->id.'.pdf');
+        return $pdf->download('tantemartje-invoice-'.$order->id.'.pdf');
     }
 
     public function streamPackingSlip($id)
@@ -50,6 +50,6 @@ class PdfController extends Controller
 
         $pdf = $this->pdf->loadView('pdf.packingSlip', ['order' => $order]);
 
-        return $pdf->download('hailsuit-packing-slip-'.$order->id.'.pdf');
+        return $pdf->download('tantemartje-packing-slip-'.$order->id.'.pdf');
     }
 }

@@ -15,84 +15,92 @@
 
 
                 <div class="sidebar">
-                    <div class="sidebar_section">
-                        <div class="sidebar_title">
-                            <h5>Product Category</h5>
-                        </div>
-                        <ul class="sidebar_categories">
-                            @foreach($categories as $category)
-                                <li class="{!! $category->id == $id ? 'active' : '' !!}">
-                                    <a href="{!! route('site.category.show', $category->id) !!}">
-                                        @if($category->id == $id)
-                                            <span><i class="fa fa-angle-double-right" aria-hidden="true"></i></span>
-                                        @endif
-                                        {!! $category->value !!}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
 
-                    <!-- Price Range Filtering -->
-                    <div class="sidebar_section">
-                        <div class="sidebar_title">
-                            <h5>Filter by Price</h5>
-                        </div>
-                        <p>
-                            <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-                        </p>
-                        <div id="slider-range"></div>
-                        <div class="filter_button"><span>filter</span></div>
-                    </div>
 
-                    @foreach(collect($baseProperties)->groupBy('property_id') as $p)
-                        <fieldset data-group="{{preg_replace("/[^a-zA-Z0-9]/", "", $p[0]->p_value)}}">
-                            <div class="sidebar_section">
-                                <div class="sidebar_title">
-                                    <h5>{{$p[0]->p_value}}</h5>
-                                </div>
-                                <ul class="checkboxes {{count($p) > 5 ? '' : 'active'}}" id="{{$p[0]->p_value}}">
-                                    @foreach($p as $arr)
-                                        <li>
+                    {!! Form::open(['route' => ['site.category.show', $category->id], 'method' => 'get', 'id' => 'filterForm']) !!}
 
-                                            {{--<i class="fa fa-square-o" aria-hidden="true"></i>--}}
-                                            <label class="selected_detail" for="{!! $arr->d_value !!}" style="width: 100% !important;">
-                                                <input type="checkbox" id="detail" name="{!! $p[0]->p_value!!}" value=".{!! preg_replace("/[^a-zA-Z0-9]/", "", $arr->d_value) !!}">
-                                                {{--(<span class="count">0</span>)--}}
-
-                                                {{$arr->d_value}}
-                                                {{--<span class="float-right">--}}
-                                                    <span class="count float-right">0</span>
-                                                {{--</span>--}}
-                                            </label>
-
-                                        </li>
-                                    @endforeach
-                                    {{--<li class="active"><i class="fa fa-square" aria-hidden="true"></i><span>M</span></li>--}}
-                                </ul>
-                                @if(count($p) > 5)
-                                    <div class="show_more" data-id="{{$p[0]->p_value}}">
-                                        <span><span>+</span>Show More</span>
-                                    </div>
-                                @endif
+                        {{--categories--}}
+                        <div class="sidebar_section">
+                            <div class="sidebar_title">
+                                <h5>Categorieën</h5>
                             </div>
-                        </fieldset>
-                    @endforeach
+                            <ul class="sidebar_categories">
+                                @foreach($categories as $category)
+                                    <li class="{!! $category->id == $id ? 'active' : '' !!}">
+                                        <a href="{!! route('site.category.show', $category->id) !!}">
+                                            @if($category->id == $id)
+                                                <span><i class="fa fa-angle-double-right" aria-hidden="true"></i></span>
+                                            @endif
+                                            {!! $category->value !!}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <br>
+
+                        {{--{!! dd($baseProducts) !!}--}}
+
+                        @if(floor($baseProducts->min('price')) !== number_format($baseProducts->max('price'),0))
+                            <div class="sidebar_section" style="margin-bottom: 30px !important; padding-bottom: 30px !important;">
+                                <div class="sidebar_title">
+                                    <h5>Prijsrange</h5>
+                                </div>
+                                <p>
+                                    <input name="priceRangeMin" value="" readonly type="text" min={!! $baseProducts->min('price') !!} max="{!! $baseProducts->max('price') !!}" oninput="validity.valid||(value='1');" id="min_price" class="price-range-field" />
+                                    <input name="priceRangeMax" value="" readonly type="text" min={!! $baseProducts->min('price') !!} max="{!! $baseProducts->max('price') !!}" oninput="validity.valid||(value='{!! $baseProducts->max('price') !!}');" id="max_price" class="price-range-field" />
+                                 </p>
+                                <div id="slider-range"></div>
+                            </div>
+                        @endif
+
+                        {{--{!! dd($filter) !!}--}}
+                        {{--filter checkboxes--}}
+                        @foreach(collect($baseProperties)->groupBy('property_id') as $p)
+                            <fieldset data-group="{{preg_replace("/[^a-zA-Z0-9]/", "", $p[0]->p_value)}}">
+                                <div class="sidebar_section">
+                                    <div class="sidebar_title">
+                                        <h5>{{$p[0]->p_value}}</h5>
+                                    </div>
+                                    <ul class="checkboxes {{count($p) > 5 ? '' : 'active'}}" id="{{$p[0]->p_value}}">
+                                        @foreach($p as $arr)
+                                            <li>
+                                                {{--<i class="fa fa-square-o" aria-hidden="true" style="display: inline-block !important;:"></i>--}}
+                                                <label for="detail{!! $arr->detail_id !!}" class="checkboxLabel" for="{!! $arr->d_value !!}" style="width: 100% !important;">
+                                                    {{$arr->d_value}}
+                                                    <input type="checkbox"  class="checkmark" id="detail{!! $arr->detail_id !!}" name="checkboxItems[]" value="{!! $arr->d_value !!}" {!! !empty($filter['checkboxItems']) ? (in_array($arr->d_value, $filter['checkboxItems']) ? 'checked' : '') : '' !!}>
+                                                    <span class="checkmark"></span>
+                                                    <span class="float-right">
+                                                        <span class="count float-right">{!! null //$arr->d_count !!}</span>
+                                                    </span>
+                                                </label>
+                                            </li>
+                                        @endforeach
+                                        {{--<li class="active"><i class="fa fa-square" aria-hidden="true"></i><span>M</span></li>--}}
+                                    </ul>
+                                    @if(count($p) > 5)
+                                        <div class="show_more" data-id="{{$p[0]->p_value}}">
+                                            <span><span>+</span>Show More</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </fieldset>
+                        @endforeach
+
+                    {!! Form::close() !!}
 
                 </div>
 
                 <!-- Main Content -->
-
                 <div class="main_content">
 
                     <!-- Products -->
-
                     <div class="products_iso">
                         <div class="row">
                             <div class="col">
 
                                 <!-- Product Sorting -->
-
                                 <div class="product_sorting_container product_sorting_container_top">
                                     <ul class="product_sorting">
                                         <li>
@@ -104,74 +112,34 @@
                                                 <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "name" }'><span>Product Naam</span></li>
                                             </ul>
                                         </li>
-                                        <li>
-                                            <span>Zichtbaar:</span>
-                                            <i class="fa fa-angle-down"></i>
-                                            <span class="num_sorting_text  float-right  " style="padding: 0px 15px; margin-left: 0px;">6</span>
-                                            <ul class="sorting_num">
-                                                <li class="num_sorting_btn"><span>8</span></li>
-                                                <li class="num_sorting_btn"><span>16</span></li>
-                                                <li class="num_sorting_btn"><span>24</span></li>
-                                                <li class="num_sorting_btn"><span>50</span></li>
-                                                <li class="num_sorting_btn"><span>100</span></li>
-                                            </ul>
+                                    </ul>
+                                    <ul class="product_sorting float-right">
+                                        <li  style="margin-right: 0px; width: auto !important; padding-right: 20px; border: none">
+                                            gevonden product <b>{!! $products->count() !!}</b> van de <b>{!! $baseProducts->count() !!}</b>
                                         </li>
                                     </ul>
-                                    {{--<div class="pages d-flex flex-row align-items-center">--}}
-                                        {{--<div class="page_current">--}}
-                                            {{--<span>1</span>--}}
-                                            {{--<ul class="page_selection">--}}
-                                                {{--<li><a href="#">1</a></li>--}}
-                                                {{--<li><a href="#">2</a></li>--}}
-                                                {{--<li><a href="#">3</a></li>--}}
-                                            {{--</ul>--}}
-                                        {{--</div>--}}
-                                        {{--<div class="page_total"><span>of</span> 3</div>--}}
-                                        {{--<div id="next_page" class="page_next"><a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></div>--}}
-                                    {{--</div>--}}
-
+                                    <br>
+                                    <br>
                                 </div>
 
                                 <!-- Product Grid -->
 
-                                <div class="product-grid">
-                                    @foreach($products as $product)
-                                        @component('components.product-card', ['product' => $product])
-                                        @endcomponent
-                                    @endforeach
-                                </div>
-
-                                <!-- Product Sorting -->
-
-                                <div class="product_sorting_container product_sorting_container_bottom clearfix">
-                                    <ul class="product_sorting">
-                                        <li>
-                                            <span>Zichtbaar:</span>
-                                            <i class="fa fa-angle-down"></i>
-                                            <span class="num_sorting_text float-right" style="padding: 0px 5px; margin-left: 0px;">6</span>
-                                            <ul class="sorting_num">
-                                                <li class="num_sorting_btn"><span>8</span></li>
-                                                <li class="num_sorting_btn"><span>16</span></li>
-                                                <li class="num_sorting_btn"><span>24</span></li>
-                                                <li class="num_sorting_btn"><span>50</span></li>
-                                                <li class="num_sorting_btn"><span>100</span></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                    {{--<span class="showing_results">Showing 1–3 of 12 results</span>--}}
-                                    {{--<div class="pages d-flex flex-row align-items-center">--}}
-                                        {{--<div class="page_current">--}}
-                                            {{--<span>1</span>--}}
-                                            {{--<ul class="page_selection">--}}
-                                                {{--<li><a href="#">1</a></li>--}}
-                                                {{--<li><a href="#">2</a></li>--}}
-                                                {{--<li><a href="#">3</a></li>--}}
-                                            {{--</ul>--}}
-                                        {{--</div>--}}
-                                        {{--<div class="page_total"><span>of</span> 3</div>--}}
-                                        {{--<div id="next_page_1" class="page_next"><a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></div>--}}
-                                    {{--</div>--}}
-
+                                <div class="container">
+                                    <div class="row">
+                                        @foreach($products as $product)
+                                            <div class="col-3 productContainer"
+                                                 style="
+                                                    background: #FFFFFF !important;
+                                                    padding: 0px 0px !important;
+                                                    display: inline-block !important;
+                                                    height: 340px !important;
+                                                " class="{{!empty($product->product->category) ? $product->product->category->value : null}}        @foreach($product->product->productDetails as $x)
+                                            {!! preg_replace("/[^a-zA-Z0-9]/", "", $x->detail->value) !!}@endforeach">
+                                                @component('components.product-card', ['product' => $product->product])
+                                                @endcomponent
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
 
                             </div>
@@ -189,8 +157,174 @@
 @push('css')
     <link rel="stylesheet" type="text/css" href="/styles/categories_styles.css">
     <link rel="stylesheet" type="text/css" href="/styles/categories_responsive.css">
+    <style>
+        .price-range-field{
+            width: 49% !important;
+            display: inline-block;
+            border: none !important;
+            padding: 0px;
+            margin: 0px;
+        }
+        #min_price{
+            text-align: left;
+        }
+        #max_price{
+            text-align: right;
+        }
+        .checkboxes li {
+            position: relative;
+        }
+        .checkboxes li i {
+            /*position: absolute;*/
+            color: #b3b7c8;
+            cursor: pointer;
+            margin-right: 22px;
+        }
+        .sidebar_section h5{
+            margin-bottom: 10px !important;
+        }
+        .sidebar_section {
+             padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+            border-bottom: solid 1px #ebebeb;
+        }
+        .productContainer > div{
+            width: 100% !important;
+        }
+    </style>
+
+<style>
+    /* The container */
+    .checkboxLabel {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* Hide the browser's default checkbox */
+    .checkboxLabel input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    /* Create a custom checkbox */
+    .checkmark {
+        position: absolute;
+        top: 9px;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #eee;
+
+    }
+
+    /* On mouse-over, add a grey background color */
+    .checkboxLabel:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .checkboxLabel input:checked ~ .checkmark {
+        background-color: #fe4c50;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .checkboxLabel input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .checkboxLabel .checkmark:after {
+        left: 6px;
+        top: 1px;
+        width: 6px;
+        height: 13px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .input-symbol-euro:before {
+        position: absolute;
+        top: 0;
+        content:"€";
+        left: 5px;
+    }
+</style>
+
 @endpush
 
 @push('js')
-    <script src="/js/categories_custom.js" type="text/javascript"></script>
+    {{--<script src="/js/categories_custom.js" type="text/javascript"></script>--}}
+<script>
+
+    var min = {!! round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1!!};
+    var max = {!! round($baseProducts->max('default_price'), 0) +1 !!};
+    var setMin = {!! isset($filter['priceRangeMin']) ? $filter['priceRangeMin'] : (round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1) !!};
+    var setMax = {!! isset($filter['priceRangeMax']) ? $filter['priceRangeMax'] : round($baseProducts->max('default_price'), 0) +1 !!};
+    {{--{!! dd( ($filter['priceRangeMax'])) !!}--}}
+    $("#min_price").val(setMin);
+    $("#max_price").val(setMax);
+
+    $("#slider-range").slider({
+        range: true,
+        orientation: "horizontal",
+        min: min,
+        max: max,
+        values: [setMin, setMax],
+        step: 1,
+        slide: function (event, ui) {
+            if (ui.values[0] == ui.values[1]) {
+                return false;
+            }
+
+            $("#min_price").val(ui.values[0]);
+            $("#max_price").val(ui.values[1]);
+            intervalTimer();
+        }
+    });
+
+    $("#amount").change(function(){
+        var priceRange = $('#amount').val();
+        console.log(priceRange);
+    });
+
+
+    var timer;
+    function intervalTimer() {
+        if (timer) clearInterval(timer);
+        timer = setInterval(function() {
+            clearInterval(timer);
+            submitForm();
+        }, 1500);
+    }
+    function submitForm(){
+        $( "#filterForm" ).submit();
+    }
+    $('#datetimepicker1').change(function() {
+        intervalTimer();
+    });
+
+    $('#filterForm').change(function() {
+        intervalTimer();
+    });
+</script>
 @endpush

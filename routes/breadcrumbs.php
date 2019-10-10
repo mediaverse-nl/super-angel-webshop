@@ -84,6 +84,11 @@ Breadcrumbs::for('admin.product.edit', function($breadcrumbs, $model) use ($edit
     $breadcrumbs->parent('admin.product.index');
     $breadcrumbs->push($edit_name, route('admin.product.edit', $model->id));
 });
+// dashboard > product > edit > type
+Breadcrumbs::for('admin.product_type.edit', function($breadcrumbs, $model) {
+    $breadcrumbs->parent('admin.product.edit', $model->product);
+    $breadcrumbs->push('Product Type', route('admin.product-type.edit', $model->id));
+});
 // dashboard > product > create
 Breadcrumbs::for('admin.product.create', function($breadcrumbs) use ($create_name) {
     $breadcrumbs->parent('admin.product.index');

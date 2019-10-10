@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Category;
 use App\Product;
+use App\ProductType;
 use App\Traits\SeoManager;
 use Artesaos\SEOTools\Traits\SEOTools;
 use App\Http\Controllers\Controller;
@@ -18,11 +19,13 @@ class CategoryController extends Controller
 
     protected $category;
     protected $product;
+    protected $productType;
 
-    public function __construct(Category $category, Product $product)
+    public function __construct(Category $category, Product $product, ProductType $productType)
     {
         $this->category = $category;
         $this->product = $product;
+        $this->productType = $productType;
     }
 
     public function index()
@@ -37,27 +40,27 @@ class CategoryController extends Controller
         $category = $this->category->findOrFail($id);
 
         //default seo
-//        $this->seo()
-//            ->setTitle($category->value .' | site.nl')
-//            ->setDescription($this->getPageSeo()->description);
-//        //opengraph
-//        $this->seo()
-//            ->opengraph()
-//            ->setUrl(url()->current())
-//            ->addProperty('type', 'website');
-//        //twitter
-//        $this->seo()
-//            ->twitter()
-//            ->setSite('@username');
+        $this->seo()
+            ->setTitle($category->value .' | site.nl')
+            ->setDescription($this->getPageSeo()->description);
+        //opengraph
+        $this->seo()
+            ->opengraph()
+            ->setUrl(url()->current())
+            ->addProperty('type', 'website');
+        //twitter
+        $this->seo()
+            ->twitter()
+            ->setSite('@username');
 
         $query = collect(request()->query)->toArray();
 
         $queryWithOutFilter = array_except($query, ['filter']);
 
-         if (!Input::has('filter') && !empty($queryWithOutFilter)){
+        if (!Input::has('filter') && !empty($queryWithOutFilter)){
             $encrypted = Crypt::encryptString(json_encode($query));
             return redirect(
-            route('site.category.show', $id).'?filter='.$encrypted
+                route('site.category.show', $id).'?filter='.$encrypted
             );
         }
 
@@ -83,67 +86,57 @@ class CategoryController extends Controller
 
         $categories = $this->category->where('category_id', '=', null)->get();
 
-        $baseProducts = $category->products()->get();
-        $baseProperties = $this->product
-            ->where('category_id', '=', $id)
-            ->join('product_details', 'products.id', '=', 'product_details.product_id')
-            ->join('details', 'product_details.detail_id', '=', 'details.id')
-            ->join('properties', 'details.property_id', '=', 'properties.id')
+        $baseProducts = $this->product->where('category_id', '=', $id)->get();
+
+        $baseProperties = $this->productType
+            ->whereHas('product', function ($q) use ($id){
+                $q->where('category_id', '=', $id);
+            })
+            ->where('status', '=', 1)
+            ->leftJoin('product_variants', 'product_types.id', '=', 'product_variants.product_type_id')
+            ->leftJoin('details', 'product_variants.detail_id', '=', 'details.id')
+            ->leftJoin('properties', 'details.property_id', '=', 'properties.id')
             ->select(
                 '*',
                 DB::raw('COUNT(details.value) as d_count'),
                 DB::raw('details.value as d_value'),
                 DB::raw('properties.value as p_value')
             )
+            ->where('details.value', '!=', 'null')
             ->groupBy('details.value')
             ->groupBy('properties.value')
             ->get();
 
-        $products = $category->products()
-//            ->whereHas('activity', function ($q) use ($category, $filter) {
-//                $q->where('category_id', '=', $category->id);
-//
-//                if(!empty($filter['regios']) && $filter['regios'] !== null){
-//                    $i = 1;
-//                    foreach ($filter['regios'] as $v){
-//                         if ($i == 1){
-//                            $q->where('activity.region', $v);
-//                        } else{
-//                            $q->orWhere('region', '=', $v);
-//                        }
-//                        $i++;
-//                    }
+        $products =  $this->productType
+            ->where('status', '=', 1)
+            ->whereHas('product', function ($q) use ($id, $filter){
+                $q->where('category_id', '=', $id);
+
+//                if (isset($filter['filterOrder'])){
+//                    $q->orderBy('default_price', 'desc');
 //                }
-//            })
-//            ->where(function ($q) use ($filter){
-//                if(!empty($filter['groep']) && $filter['groep'] !== null){
-//                    $i = 1;
-//                    foreach ($filter['groep'] as $i){
-//                        if ($i == 1){
-//                            $q->where('target_group', '=', $i);
-//                        } else{
-//                            $q->orWhere('target_group', '=', $i);
-//                        }
-//                        $i++;
-//                    }
-//                }
-//            })
-//            ->where(function ($q) use ($filter){
-//                if (!empty($filter['van_datum'])){
-//                     $q->whereDate('start_datetime', '>=', $filter['van_datum']);
-//                }
-//                if (!empty($filter['tot_datum'])){
-//                    $q->whereDate('start_datetime', '<=', $filter['tot_datum']);
-//                }
-//            })
-//            ->where(function ($q) use ($filter){
-//                if (!empty($filter['prijs']) ){
-//                    $q->whereBetween('price', [explode(',',$filter['prijs'])[0], explode(',',$filter['prijs'])[1]]);
-//                }
-//            })
-//            ->where('status', '=', 'public')
-//            ->whereDate('start_datetime', '>=', $from)
-//            ->orderBy('start_datetime', 'asc')
+
+                if (isset($filter['priceRangeMin']) || isset($filter['priceRangeMax'])){
+                    $q->whereBetween('default_price', [$filter['priceRangeMin'], $filter['priceRangeMax']]);
+                }
+            })
+            ->where(function($sub) use ($filter){
+                if (isset($filter['checkboxItems'])) {
+                    $sub->whereHas('productVariants.detail', function ($q) use ($filter) {
+                        $count = 0;
+                        foreach ($filter['checkboxItems'] as $i) {
+                            $count++;
+                            if ($count == 1) {
+                                $q->where('value', '=', $i);
+                            } else {
+                                $q->orWhere('value', '=', $i);
+                            }
+                        }
+                    });
+                }
+            })
+            ->groupBy('product_id')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         return view('site.category')
@@ -155,4 +148,5 @@ class CategoryController extends Controller
             ->with('categories', $categories)
             ->with('category', $category);
     }
+
 }

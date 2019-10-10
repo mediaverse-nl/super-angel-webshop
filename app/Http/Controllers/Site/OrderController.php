@@ -6,6 +6,7 @@ use App\Http\Requests\Site\OrderStoreRequest;
 use App\Mail\OrderConfirmation;
 use App\Order;
 use App\Product;
+use App\ProductType;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -23,18 +24,19 @@ class OrderController extends Controller
     protected $mollie;
     protected $order;
     protected $product;
+    protected $productType;
 
-    public function __construct(Order $order, Product $product)
+    public function __construct(Order $order, Product $product, ProductType $productType)
     {
         $this->order = $order;
         $this->product = $product;
+        $this->productType = $productType;
         $this->mollie = Mollie::api();
     }
 
     public function store(OrderStoreRequest $request)
     {
         $order = $this->order;
-
         $order->name = $request->naam;
         $order->email = $request->email;
         $order->user_id = auth()->check() ? auth()->user()->id : null;
@@ -46,23 +48,28 @@ class OrderController extends Controller
         $order->address_number = $request->huisnummer;
         $order->telephone_home = $request->telefoonnummer_vast;
         $order->telephone_mobile = $request->telefoonnummer_mobiel;
-        $order->total_paid = number_format(Cart::total() +  env('SHIPPING_COST'), 2);
-        $order->shipping_costs = env('SHIPPING_COST');
-        $order->payment_id = null;
-        $order->payment_method = null;
+        $order->total_paid = number_format(Cart::total() +  calcBtwExcl(env('SHIPPING_COST'), 21), 2);
+        $order->shipping_costs = calcBtwExcl(env('SHIPPING_COST'), 21);
         $order->delivery_note = $request->aflevernotitie;
         $order->note = $request->opmerking;
         $order->status = self::STATUS_PENDING;
-
         $order->save();
-
         $products = [];
+
+
         foreach (Cart::content() as $i){
+            $productType = $this->productType->find($i->options[0]->id);
+            $productType->reduceStock($i->qty);
             $products[] = [
-                'product_id' => $i->id,
+                'product_id' => $productType->product->id,
                 'order_id' => $order->id,
                 'order_qty' => $i->qty,
-                'unit_price' => $i->options[0]->price(),
+                'unit_price' => $productType->price,
+                'data' => json_encode([
+                    'product_type_id' => $productType->id,
+                    'ean' => $productType->ean,
+                    'variants' => implode(' • ', $productType->productVariants->pluck('detail.value')->toArray()),
+                ]),
             ];
         }
 
@@ -78,9 +85,15 @@ class OrderController extends Controller
             ],
         ]);
 
-        session(['order' => encrypt($payment->id)]);
+        $order = $this->order->findOrFail($order->id);
+        $order->payment_id = $payment->id;
+        $order->save();
 
-        $order->update(['payment_id' => $payment->id]);
+        ///back here
+        ///
+        ///
+
+        session(['order' => encrypt($payment->id)]);
 
         // redirect customer to Mollie checkout page
         return redirect($payment->getPaymentUrl(), 303);
@@ -120,38 +133,30 @@ class OrderController extends Controller
 
         $paymentId = session('order');
 
-        if (auth()->check() && $order->user_id !== null){
+
+        if (auth()->check() && $order->user_id !== null) {
             if($order->user_id !== (auth()->check() ? auth()->user()->id : null)){
                 abort(403);
             }
         }
 
-        if ($order->payment_id !== decrypt($paymentId)){
+        if (empty($paymentId)){
             abort(403);
+        }else{
+            if ($order->payment_id !== decrypt($paymentId)){
+                abort(403);
+            }
         }
 
         $payment =  $this->mollie->payments()->get($order->payment_id);
 
-        if ($payment->isPaid())
+        if ($order->status == self::STATUS_COMPLETED)
         {
-            if ($order->status != 'paid'){
-                Mail::to($order->email)
-                    ->send(new OrderConfirmation($order));
-            }
-
-            $order->status = self::STATUS_COMPLETED;
-            $order->payment_method = $payment->method;
-            $order->save();
-
             return view('site.show-order')
                 ->with('order', $order->toArray())
                 ->with('payment', $payment);
-        } elseif (! $payment->isOpen())
-        {
-            $order->status = self::STATUS_CANCELLED;
-            $order->save();
+        } else {
             abort(404);
         }
-
     }
 }

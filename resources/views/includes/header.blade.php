@@ -20,16 +20,17 @@
                                         <i class="fa fa-angle-down"></i>
                                     </a>
                                     <ul class="account_selection" style=" width: auto !important;">
-                                        <li><a href="#" style="padding: 0px 15px;">Mijn Bestellingen</a></li>
-                                        <li><a href="#" style="padding: 0px 15px;">Mijn Gegevens</a></li>
+                                        <li><a href="{!! route('auth.order.index') !!}" style="padding: 0px 15px;">Mijn Bestellingen</a></li>
+                                        <li><a href="{!! route('auth.account.edit') !!}" style="padding: 0px 15px;">Mijn Gegevens</a></li>
+                                        <li><a href="{{ url('/logout') }}" style="padding: 0px 15px; opacity: 0.5;">Uitloggen</a></li>
                                     </ul>
                                 </li>
                             @else
                                 <li class="account">
-                                    <a href="{!! route('login') !!}">Sign In</a>
+                                    <a href="{!! route('login') !!}">Inloggen</a>
                                 </li>
                                 <li class="account">
-                                    <a href="{!! route('register') !!}">Register</a>
+                                    <a href="{!! route('register') !!}">Registreren</a>
                                 </li>
                             @endif
                         </ul>
@@ -95,16 +96,40 @@
         <ul class="menu_top_nav">
             <li class="menu_item has-children">
                 <a href="#">
-                    My Account
+                    @if(auth()->check())
+                        Welkom, {!! auth()->user()->name !!}
+                    @else
+                        Mijn Account
+                    @endif
                     <i class="fa fa-angle-down"></i>
                 </a>
                 <ul class="menu_selection">
-                    <li><a href="#">Sign In</a></li>
-                    <li><a href="#">Register</a></li>
+                    @if(auth()->check())
+                        <li><a href="#" style="padding: 0px 15px;">Mijn Bestellingen -</a></li>
+                        <li><a href="#" style="padding: 0px 15px;">Mijn Gegevens -</a></li>
+                        <li><a href="{{ url('/logout') }}" style="opacity: 0.5; padding: 0px 15px;">Uitloggen -</a></li>
+                    @else
+                        <li><a href="{!! route('login') !!}" style="padding: 0px 15px;">Inloggen -</a></li>
+                        <li><a href="{!! route('register') !!}" style="padding: 0px 15px;">Registreren -</a></li>
+                    @endif
                 </ul>
             </li>
+
             <li class="menu_item"><a href="{!! route('home') !!}">home</a></li>
-            <li class="menu_item"><a href="{!! route('site.category.index') !!}">shop</a></li>
+            <li class="menu_item has-children">
+                <a href="#">
+                    shop
+                    <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="menu_selection">
+                    @foreach($categoryMenu as $c)
+                        <li><a href="{!! route('site.category.show', [$c->id]) !!}" style="padding: 0px 15px;">{!! $c->value !!} -</a></li>
+                    @endforeach
+                </ul>
+            </li>
+
+            {{--<li class="menu_item"><a href="{!! route('site.category.index') !!}">shop</a></li>--}}
+            <li class="menu_item"><a href="{!! route('site.about') !!}">Over Ons</a></li>
             <li class="menu_item"><a href="{!! route('site.contact.index') !!}">contact</a></li>
         </ul>
     </div>

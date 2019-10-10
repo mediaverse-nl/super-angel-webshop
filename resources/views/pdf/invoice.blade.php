@@ -8,8 +8,8 @@
         .invoice-box {
             max-width: 800px;
             margin: auto;
-            padding: 30px;
-            border: 1px solid #eee;
+            /*padding: 30px;*/
+            /*border: 1px solid #eee;*/
             box-shadow: 0 0 10px rgba(0, 0, 0, .15);
             font-size: 16px;
             line-height: 24px;
@@ -111,22 +111,18 @@
 <div class="invoice-box">
     <table cellpadding="0" cellspacing="0">
         <tr class="top">
-            <td colspan="2">
-                <table >
+            <td colspan="3">
+                <table style="width: 100vh ;">
                     <tr>
-                        <td class="title">
+                        <td class="title" style="width: 50% ; ">
                             tantemartje.nl
                             {{--<img src="" style="width:270px;">--}}
                         </td>
-                        {{--<td></td>--}}
 
-                        <td style="background: #eee;border-bottom: 1px solid #ddd; text-align: right; padding: 10px;">
+                        <td style="width: 50% ; background: #eee;border-bottom: 1px solid #ddd;   margin-right: -15px; padding: 10px;">
                             <b>Factuur #{{$order->id}}</b> <br>
                             Aankoop datum
                             <br>{{$order->created_at->format('d-m-Y') }}
-                            {{--Verval datum: <br>{{Carbon\Carbon::parse($order->created_at->format('M d Y'))--}}
-                                {{--->addDays(14)--}}
-                                {{--->formatLocalized('%d %B %Y')}} <br>--}}
                         </td>
                     </tr>
                 </table>
@@ -143,7 +139,7 @@
                             5615 AB Eindhoven,<br>
                             Nederland<br><br>
                             Site: www.tantemartje.nl <br>
-                            {{--Tel: +31 (0) 6 22527092<br>--}}
+                            Tel: +31 (0) 6 -----<br>
                             E-mail: info@tantemartje.nl<br>
                             BTW: ---<br>
                             KvK: ---<br>
@@ -151,12 +147,15 @@
                         <td> </td>
 
                         <td  style="text-align: right">
+                            <b>Klant gegevens</b> <br>
+                            {{$order->name}}<br>
                             {{$order->address}}
                             {{$order->address_number}},<br>
                             {{$order->postal_code}} {{$order->city}} <br>
                             <br>
-                            {{$order->name}}<br>
-                            {{$order->email}}
+                            {{$order->email}}<br>
+                            {{$order->telephone_home}}<br>
+                            {{$order->telephone_mobile}}
                         </td>
                     </tr>
                 </table>
@@ -176,7 +175,11 @@
 
         <tr class="details">
             <td>
-                {{$order->payment_method}}
+                @if($order->payment_method)
+                    {{$order->payment_method}}
+                @else
+                    N.v.t. - Betaling is nog niet voldaan.
+                @endif
             </td>
             <td></td>
             <td>
@@ -194,7 +197,7 @@
             </td>
 
             <td>
-                Kaartjes
+                Aantal
             </td>
             <td style="text-align: right">
                 p.st.
@@ -208,23 +211,55 @@
                 Totaal
             </td>
 
-
             {{--<td style="text-align: right">--}}
                 {{--Btw--}}
             {{--</td>--}}
         </tr>
 
-         <tr class="item">
-            <td  style="padding: 10px 5px;">
-{{--                {!! $order->event->activity->title !!} <br>--}}
-{{--                {!! $order->event->start_datetime->formatLocalized('%A, %d %B %Y') !!} <br>--}}
-{{--                van {!! $order->event->start_datetime->formatLocalized('%H:%M') !!} t/m {!! $order->event->end_datetime->formatLocalized('%H:%M') !!} uur--}}
-            </td>
-            <td style="text-align: right; padding: 10px 5px;">&euro;{!! number_format($order->total_paid, 2) !!}</td>
-             <td style="text-align: right; padding: 10px 5px;">21%</td>
+        @foreach($order->productOrders as $item)
 
-             <td style="text-align: right; padding: 10px 5px;">&euro;{!!  number_format($order->total_paid, 2) !!}</td>
+            <tr class="item">
+                <td>
+                    {!! $item->product->title !!}
+                    <b>{!! (!$item->product->hasOneProductType() ? (' - '.json_decode($item->data, true)['variants']): '') !!}</b>
+                </td>
+                <td>
+                    {!! $item->order_qty!!}
+                </td>
+                <td style="text-align: right">
+                    €{!! number_format($item->unit_price, 2) !!}
+                    {{--{!! dd(json_decode($item->data, true))!!}--}}
+                </td>
+                <td style="text-align: right">
+                    €{!! number_format((($item->unit_price * $item->order_qty) - ($item->unit_price * $item->order_qty / 121 * 100) ), 2)!!}
+                    {{--{!! dd(json_decode($item->data, true))!!}--}}
+                </td>
+                <td style="text-align: right">
+                    €{!! number_format($item->unit_price * $item->order_qty , 2)   !!}
+                    {{--{!! dd(json_decode($item->data, true))!!}--}}
+                </td>
+            </tr>
+
+        @endforeach
+
+
+        <tr class="item">
+            <td>
+                {{--{!! dd($item) !!}--}}
+                verzendkosten <small>Excl. BTW</small>
+            </td>
+            <td>
+            </td>
+            <td style="text-align: right">
+            </td>
+            <td style="text-align: right">
+            </td>
+            <td style="text-align: right">
+                €{!! number_format(exclBtw($order->shipping_costs, 21), 2)   !!}
+                {{--{!! dd(json_decode($item->data, true))!!}--}}
+            </td>
         </tr>
+
 
         <tr class="">
             <td> </td>
@@ -233,7 +268,16 @@
             <td colspan="2" style="text-align: right">
                 <br>
                 <br>
-                <b>BTW: <span >€{{number_format($order->total_paid - ($order->total_paid - ($order->total_paid / 121) * 21), 2)}}</span></b>
+                <b>btw: <span >€{{ number_format(Btw($order->total_paid, 21), 2) }}</span></b>
+            </td>
+        </tr>
+
+        <tr class=" ">
+            <td> </td>
+            <td> </td>
+            <td> </td>
+            <td colspan="2" style="text-align: right">
+                <b>Excl. btw: <span >€{{number_format( exclBtw($order->total_paid, 21), 2)}}</span></b>
             </td>
         </tr>
 
@@ -247,7 +291,12 @@
         </tr>
     </table>
 
-    {{--<div id='footer'>company information</div>--}}
+    <hr>
+    <p>
+        <b>bank:</b> code |
+        <b>bankrekening:</b> NL00ABNA xxxxxx |
+        <b>BIC code:</b> NL00ABNA xxxxxx
+    </p>
 
 </div>
 </body>

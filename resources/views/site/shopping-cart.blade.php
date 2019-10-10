@@ -55,14 +55,22 @@
                                         <tr>
                                              <th scope="row" class="border-0">
                                                 <div class="p-2">
-                                                    <img src="{!! $i->options[0]->thumbnail() !!}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                                                    <img src="{!! $i->options[0]->product->thumbnail() !!}" alt="" width="70" class="img-fluid rounded shadow-sm">
                                                     <div class="ml-3 d-inline-block align-middle">
-                                                        <h5 class="mb-0"> <a href="{!! route('site.product.show', [$i->options[0]->urlTitle, $i->options[0]->id]) !!}" class="text-dark d-inline-block align-middle">{!! $i->name !!}</a></h5><span class="text-muted font-weight-normal font-italic d-block">Category: {!! $i->options[0]->category->value !!}</span>
+                                                        <h5 class="mb-0">
+                                                            <a href="{!! route('site.product.show', [$i->options[0]->product->urlTitle, $i->options[0]->product->id]) !!}" class="text-dark d-inline-block align-middle">{!! $i->name !!}</a>
+                                                        </h5>
+                                                        <span class="text-muted font-weight-normal font-italic d-block">
+                                                            Category: {!! $i->options[0]->product->category->value !!}
+                                                            @foreach($i->options[0]->productVariants->pluck('detail.value', 'detail.property.value') as $key => $vari)
+                                                                • <span class="badge badge-default">{!! $key !!}: {!! $vari !!}</span>
+                                                            @endforeach
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </th>
                                             <td class="border-0 align-middle price-row">
-                                                @if($i->options[0]->discount)
+                                                @if($i->options[0]->product->discount)
                                                     <strong>{!! $i->options[0]->discountPrice !!}</strong>
                                                     <small style="text-decoration: line-through;">{!! $i->options[0]->productPrice !!}</small>
                                                 @else
@@ -124,23 +132,28 @@
                         </p>
                         <ul class="list-unstyled mb-4">
                             <li class="d-flex justify-content-between py-3 border-bottom">
-                                <strong class="text-muted">Subtotaal </strong>
+                                <strong class="text-muted">Subtotaal <small>excl. BTW</small></strong>
                                 <strong>&euro;{!!  number_format(Cart::subtotal(), 2) !!}</strong>
                             </li>
                             <li class="d-flex justify-content-between py-3 border-bottom">
-                                <strong class="text-muted">Verzendingskosten</strong>
-                                <strong>&euro;{!! env('SHIPPING_COST') !!}</strong>
+                                <strong class="text-muted">
+                                    Verzendingskosten
+                                    <small>excl. BTW</small>
+                                </strong>
+                                <strong>&euro;{!! Cart::count() == 0 ? '-' : env('SHIPPING_COST') !!}</strong>
                             </li>
                             <li class="d-flex justify-content-between py-3 border-bottom">
                                 <strong class="text-muted">
                                     BTW
                                     <small>21%</small>
                                 </strong>
-                                <strong>&euro;{!! number_format(Cart::tax(), 2) !!}</strong>
+                                <strong>&euro;{!! number_format(Cart::tax() + calcBtwExcl(env('SHIPPING_COST'), 21), 2) !!}</strong>
                             </li>
                             <li class="d-flex justify-content-between py-3 border-bottom">
                                 <strong class="text-muted">Totaal</strong>
-                                <h5 class="font-weight-bold">&euro;{!! number_format(Cart::total() + env('SHIPPING_COST'), 2) !!}</h5>
+                                <h5 class="font-weight-bold">
+                                    &euro;{!! number_format(Cart::total() + calcBtwExcl(env('SHIPPING_COST'), 21), 2) !!}
+                                </h5>
                             </li>
                         </ul>
                         <a href="{!! route('site.cart.create') !!}" class="btn btn-dark rounded-pill py-2 btn-block">Bestelling afronden</a>
