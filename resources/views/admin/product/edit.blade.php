@@ -159,15 +159,14 @@
                         of {!! $product->productTypes->count() !!} variant
                         <hr>
                         <div class="row" id="optionRow">
+                            {{--{!! dd(1) !!}--}}
                             @foreach($properties->sortBy('value') as $option)
-                                <div class="col-md-4 col-sm-6 col-xl-4 d-none selected-item-{!! $option->value !!}" id="baseOption">
+                                <div class="col-md-4 col-sm-6 col-xl-4 {!! !$errors->has('variant_options') ? 'd-none': '' !!} selected-item-{!! $option->value !!}" id="baseOption">
                                     <div class="form-group">
                                         {!! Form::label('value', $option->value, ['class' => 'selectedOption']) !!} <br>
-                                        <select name="variant_options[{!! $option->id !!}][]"  class="selectpicker" multiple data-live-search="true" id="selectedInput{!! $option->value !!}">
-                                            @foreach($option->details as $detail)
-                                                <option value="{!! $detail->id !!}">{!! $detail->value !!}</option>
-                                            @endforeach
-                                        </select>
+                                        {!! Form::hidden('variant_options['.$option->id .']', null, ['multiple', 'id' => 'selectedInput'.$option->value]) !!}
+                                        {!! Form::select('variant_options['.$option->id .'][]', $option->details->pluck('value', 'id')->toArray(), null, ['class' => 'selectpicker', 'id' => 'selectedInput'.$option->value , 'multiple', 'data-live-search' => 'true']) !!}
+                                        @include('components.error', ['field' => 'variant_options.'.$option->id])
                                     </div>
                                 </div>
                             @endforeach
@@ -180,13 +179,7 @@
                                 </button>
                             </div>
                             <div class="custom-select" style="padding: 0px !important;">
-                                <select class="selectpicker" id="inputGroupSelected" data-max-options="3" multiple style="border-radius: 0px !important; ">
-                                    @foreach($properties->sortBy('value') as $property)
-                                        <option value="{!! $property->value !!}" data-filter-options='{!!($property->details()->pluck('id', 'value'))!!}' >
-                                            {!! $property->value !!}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                {!! Form::select('change_options[]', $properties->sortBy('value')->pluck('value', 'value')->toArray(), null, ['class' => 'selectpicker', 'id' => 'inputGroupSelected', 'data-max-options' => '3', 'multiple', 'style' => 'border-radius: 0px !important;']) !!}
                             </div>
                         </div>
                         <hr>
@@ -341,16 +334,16 @@
 
             $("#inputGroupSelected > option").each(function() {
                 if ($('#inputGroupSelected.d-none').length == 0) {
-                    $('.selected-item-' + this.value).addClass('d-none');
-                    $('.selected-item-'+ this.value + ' select').prop('disabled',true);
-                    $('.selected-item-'+ this.value + ' select').selectpicker('refresh');
+                    $('.selected-item-' + this.value).addClass("d-none");
+                    $('.selected-item-'+ this.value + ' input').prop('disabled',true);
+                    $('.selected-item-'+ this.value + ' input').selectpicker('refresh');
                 }
             });
 
             $("#inputGroupSelected > option:selected").each(function() {
                 $('.selected-item-'+ this.value).removeClass('d-none');
-                $('.selected-item-'+ this.value + ' select').prop('disabled',false);
-                $('.selected-item-'+ this.value + ' select').selectpicker('refresh');
+                $('.selected-item-'+ this.value + ' input').prop('disabled',false);
+                $('.selected-item-'+ this.value + ' input').selectpicker('refresh');
             });
         }
 

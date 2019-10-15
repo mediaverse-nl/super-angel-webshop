@@ -40,6 +40,8 @@ class StoreModelNotification extends Notification
      */
     public function toDatabase($notifiable)
     {
+        session()->put('success','Item stored successfully.');
+
         return [
             'subject' => 'Created',
             'description' => 'Stored new entry: <b>'.$this->model->getTable().'</b>',

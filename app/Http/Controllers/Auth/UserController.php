@@ -42,7 +42,7 @@ class UserController extends Controller
     {
         $user = $this->user->find(auth()->user()->id);
 
-        $user->first_name = $request->voornaam;
+        $user->first_name = $request->naam;
         $user->phone_nr = $request->telefoon_nr;
         $user->last_name = $request->achternaam;
         $user->country = $request->land;

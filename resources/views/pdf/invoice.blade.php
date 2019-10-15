@@ -246,16 +246,17 @@
         <tr class="item">
             <td>
                 {{--{!! dd($item) !!}--}}
-                verzendkosten <small>Excl. BTW</small>
+                verzendkosten {!!  $order->shipping_costs != 0 ? '<small>Excl. BTW</small>' : null!!}
             </td>
             <td>
+                1
             </td>
             <td style="text-align: right">
             </td>
             <td style="text-align: right">
             </td>
             <td style="text-align: right">
-                €{!! number_format(exclBtw($order->shipping_costs, 21), 2)   !!}
+                {!! $order->shipping_costs != 0 ? '€'.number_format(exclBtw($order->shipping_costs, 21), 2) : 'gratis' !!}
                 {{--{!! dd(json_decode($item->data, true))!!}--}}
             </td>
         </tr>
@@ -286,7 +287,7 @@
             <td> </td>
             <td> </td>
             <td colspan="2" style="text-align: right">
-                <b>Totaal: <span >€{{$order->total_paid}}</span></b>
+                <b>Totaal: <span >€{{number_format($order->total_paid, 2)}}</span></b>
             </td>
         </tr>
     </table>

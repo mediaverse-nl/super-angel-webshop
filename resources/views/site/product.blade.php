@@ -82,13 +82,10 @@
                         @endfor
                     </ul>
                     <small><b>{!! $product->reviews->avg('rating') == null ?  'geen reviews' :   $product->reviews->avg('rating').' / 5'!!} </b></small>
-
                     <br>
                     <br>
                     <table>
                     @php
-
-
                         $filterArray = [];
 
                         foreach ($product->productTypes as $type){
@@ -107,16 +104,11 @@
 
                     @foreach($filterArray as $k => $v)
                         <tr>
-                            <td style="padding: 2px 0px;">
+                            <td style="padding: 2px 0px; width: 250px !important;">
                                 <b style="margin-top: 10px;">{!! $k !!}:</b><br>
-                                <select name="filter[]" id="filter-{!! $k !!}" onchange="disableInputs({!! $loop->index !!})" class="filterInput form_input input_name" {!! $loop->index == 0 ? '' : 'disabled' !!} style="margin: 0px !important; height: 35px;">
+                                <select name="filter[]" id="filter-{!! $k !!}" onchange="disableInputs({!! $loop->index !!})" class="filterInput form_input input_name" {!! $loop->index == 0 ? '' : 'disabled' !!} style="height: 40px !important; margin: 0px !important; height: 35px;">
                                     {{--@if($loop->index == 0)--}}
                                         <option value="">-- select --</option>
-                                    {{--@endif--}}
-                                    {{--@foreach($v as $d)--}}
-                                        {{--<option value="{!! $d !!}">{!! $d !!}</option>--}}
-                                    {{--@endforeach--}}
-
                                 </select>
                             </td>
                         </tr>
@@ -139,13 +131,11 @@
                             {!! Form::model($product, array('route' => 'site.cart.add', 'method' => 'post')) !!}
                                 <input type="hidden" value="1" name="qty" id="qtyInput">
                                 <input type="hidden" value="" name="product_id" class="pull-left" id="productId" required>
-                                <button class="red_button add_to_cart_button" style="color: #FFFFFF; border: none !important;">winkelmandje</button>
+                                <button class="red_button add_to_cart_button" style="color: #FFFFFF; border: none !important;" disabled>winkelmandje</button>
                             {{ Form::close() }}
                         @else
-                            <button class="red_button add_to_cart_button disabled" style="opacity: .5; color: #FFFFFF; border: none !important;">uitverkocht</button>
+                            <button class="red_button add_to_cart_button disabled" disabled style="opacity: .5; color: #FFFFFF; border: none !important;">uitverkocht</button>
                         @endif
-
-                        {{--<div class="red_button add_to_cart_button"><a href="#">add to cart</a></div>--}}
                         <div class="product_favorite d-flex flex-column align-items-center justify-content-center"></div>
                     </div>
                 </div>
@@ -274,7 +264,7 @@
 
                             @else
                                 <div>
-                                    <h1>Log in om een revieuw achter te laten</h1>
+                                    <h1>Log in om een review achter te laten</h1>
                                     <br>
                                 </div>
                                 <div class="">
@@ -301,6 +291,14 @@
 @push('css')
     <link rel="stylesheet" type="text/css" href="/styles/single_styles.css">
     <link rel="stylesheet" type="text/css" href="/styles/single_responsive.css">
+    <style>
+        button[disabled=disabled], button:disabled {
+            cursor: not-allowed;
+            background-color: rgb(229, 229, 229) !important
+            color: #c0c0c0;
+            opacity: 0.5;
+        }
+    </style>
 @endpush
 
 @push('js')
@@ -319,9 +317,10 @@
         }
 
         function getFilterResponse(selectedOptions) {
-            $.get("/test-me/{!!  $product->id !!}?data=" + selectedOptions,
+            $.get("/api/product-type-{!!  $product->id !!}?data=" + selectedOptions,
                 function(data, status){
                     var el = $('.filterInput option:selected[value=""]').parent().attr('id');
+                    $(".red_button.add_to_cart_button").prop('disabled', true);
 
                     if(el){
                         var selectedArray = data.filter_options[el.replace('filter-', '')];
@@ -341,9 +340,8 @@
                         }
                         $('.product_price').text( '€ '+data.product_variant.selling_price.toFixed( 2 ));
                         $('#productId').val(data.product_id);
+                        $(".red_button.add_to_cart_button").prop('disabled', false);
                     }
-
-                    console.log(data);
                 }
             );
         }

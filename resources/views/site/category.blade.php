@@ -43,13 +43,18 @@
                         {{--{!! dd($baseProducts) !!}--}}
 
                         @if(floor($baseProducts->min('price')) !== number_format($baseProducts->max('price'),0))
-                            <div class="sidebar_section" style="margin-bottom: 30px !important; padding-bottom: 30px !important;">
+                            <div class="sidebar_s ection" style="margin-bottom: 30px !important; padding-bottom: 30px !important;">
                                 <div class="sidebar_title">
                                     <h5>Prijsrange</h5>
                                 </div>
                                 <p>
-                                    <input name="priceRangeMin" value="" readonly type="text" min={!! $baseProducts->min('price') !!} max="{!! $baseProducts->max('price') !!}" oninput="validity.valid||(value='1');" id="min_price" class="price-range-field" />
-                                    <input name="priceRangeMax" value="" readonly type="text" min={!! $baseProducts->min('price') !!} max="{!! $baseProducts->max('price') !!}" oninput="validity.valid||(value='{!! $baseProducts->max('price') !!}');" id="max_price" class="price-range-field" />
+                                    <span id="minPriceSpan">
+                                        <input name="priceRangeMin" value="" type="text" readonly oninput="validity.valid||(value='1');" id="min_price" class="price-range-field" />
+                                    </span>
+                                    <span id="maxPriceSpan">
+                                        <input name="priceRangeMax" value="" type="text" readonly oninput="validity.valid||(value='{!! $baseProducts->max('price') !!}');" id="max_price" class="price-range-field" />
+                                    </span>
+
                                  </p>
                                 <div id="slider-range"></div>
                             </div>
@@ -81,7 +86,7 @@
                                     </ul>
                                     @if(count($p) > 5)
                                         <div class="show_more" data-id="{{$p[0]->p_value}}">
-                                            <span><span>+</span>Show More</span>
+                                            <span><span>+</span>laat meer zien</span>
                                         </div>
                                     @endif
                                 </div>
@@ -125,19 +130,22 @@
                                 <!-- Product Grid -->
 
                                 <div class="container">
-                                    <div class="row">
+                                    <div class="row" id="prod uctContainers" style="width: 100% !important; padding: 0px !important; margin: 0px;">
                                         @foreach($products as $product)
-                                            <div class="col-3 productContainer"
-                                                 style="
-                                                    background: #FFFFFF !important;
-                                                    padding: 0px 0px !important;
-                                                    display: inline-block !important;
-                                                    height: 340px !important;
-                                                " class="{{!empty($product->product->category) ? $product->product->category->value : null}}        @foreach($product->product->productDetails as $x)
-                                            {!! preg_replace("/[^a-zA-Z0-9]/", "", $x->detail->value) !!}@endforeach">
-                                                @component('components.product-card', ['product' => $product->product])
+                                            {{--<div class="col-xs-12 col-sm-12 col-md-6 col-lg-3 productContainer"--}}
+                                                 {{--style="--}}
+                                                    {{--background: #FFFFFF !important;--}}
+                                                    {{--padding: 0px 0px !important;--}}
+                                                    {{--display: inline-block !important;--}}
+                                                {{--" class="{{!empty($product->product->category) ? $product->product->category->value : null}}        @foreach($product->product->productDetails as $x)--}}
+{{--                                            {!! preg_replace("/[^a-zA-Z0-9]/", "", $x->detail->value) !!}@endforeach">--}}
+                                                @component('components.product-card', [
+                                                    'product' => $product->product,
+                                                    'classes' => 'col-xs-12 col-sm-12 col-md-6 col-lg-3',
+                                                    'style' => 'padding:0px !important;'
+                                                    ])
                                                 @endcomponent
-                                            </div>
+                                            {{--</div>--}}
                                         @endforeach
                                     </div>
                                 </div>
@@ -191,140 +199,219 @@
         .productContainer > div{
             width: 100% !important;
         }
+        /* The container */
+        .checkboxLabel {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Hide the browser's default checkbox */
+        .checkboxLabel input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 9px;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #eee;
+
+        }
+
+        /* On mouse-over, add a grey background color */
+        .checkboxLabel:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .checkboxLabel input:checked ~ .checkmark {
+            background-color: #fe4c50;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .checkboxLabel input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .checkboxLabel .checkmark:after {
+            left: 6px;
+            top: 1px;
+            width: 6px;
+            height: 13px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .input-symbol-euro:before {
+            position: absolute;
+            top: 0;
+            content:"€";
+            left: 5px;
+        }
+
+        /*#min_price{*/
+            /*padding-right: 25px;*/
+        /*}*/
+
+        /*#minPriceSpan::before {*/
+            /*content: "€";*/
+            /*!*padding-left: 20px;*!*/
+            /*color: black;*/
+            /*font-size: 14px;*/
+            /*!*left: 3px;*!*/
+            /*!*margin-right: 25px;*!*/
+            /*position: absolute;*/
+            /*line-height: inherit;*/
+        /*}*/
+        /*#maxPriceSpan::before {*/
+            /*content: "€";*/
+            /*color: black;*/
+            /*font-size: 14px;*/
+            /*right: 3px;*/
+            /*margin-right: 25px;*/
+            /*position: absolute;*/
+            /*line-height: inherit;*/
+        /*}*/
     </style>
-
-<style>
-    /* The container */
-    .checkboxLabel {
-        display: block;
-        position: relative;
-        padding-left: 35px;
-        margin-bottom: 12px;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    /* Hide the browser's default checkbox */
-    .checkboxLabel input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-    }
-
-    /* Create a custom checkbox */
-    .checkmark {
-        position: absolute;
-        top: 9px;
-        left: 0;
-        height: 18px;
-        width: 18px;
-        background-color: #eee;
-
-    }
-
-    /* On mouse-over, add a grey background color */
-    .checkboxLabel:hover input ~ .checkmark {
-        background-color: #ccc;
-    }
-
-    /* When the checkbox is checked, add a blue background */
-    .checkboxLabel input:checked ~ .checkmark {
-        background-color: #fe4c50;
-    }
-
-    /* Create the checkmark/indicator (hidden when not checked) */
-    .checkmark:after {
-        content: "";
-        position: absolute;
-        display: none;
-    }
-
-    /* Show the checkmark when checked */
-    .checkboxLabel input:checked ~ .checkmark:after {
-        display: block;
-    }
-
-    /* Style the checkmark/indicator */
-    .checkboxLabel .checkmark:after {
-        left: 6px;
-        top: 1px;
-        width: 6px;
-        height: 13px;
-        border: solid white;
-        border-width: 0 3px 3px 0;
-        -webkit-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        transform: rotate(45deg);
-    }
-
-    .input-symbol-euro:before {
-        position: absolute;
-        top: 0;
-        content:"€";
-        left: 5px;
-    }
-</style>
 
 @endpush
 
 @push('js')
     {{--<script src="/js/categories_custom.js" type="text/javascript"></script>--}}
-<script>
+    <script>
+        var min = {!! round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1!!};
+        var max = {!! round($baseProducts->max('default_price'), 0) +1 !!};
+        var setMin = {!! isset($filter['priceRangeMin']) ? $filter['priceRangeMin'] : (round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1) !!};
+        var setMax = {!! isset($filter['priceRangeMax']) ? $filter['priceRangeMax'] : round($baseProducts->max('default_price'), 0) +1 !!};
+        {{--{!! dd( ($filter['priceRangeMax'])) !!}--}}
+        $("#min_price").val(setMin);
+        $("#max_price").val(setMax);
 
-    var min = {!! round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1!!};
-    var max = {!! round($baseProducts->max('default_price'), 0) +1 !!};
-    var setMin = {!! isset($filter['priceRangeMin']) ? $filter['priceRangeMin'] : (round($baseProducts->min('default_price'), 0) -1 > 0 ? round($baseProducts->min('default_price'), 0) -1 : 1) !!};
-    var setMax = {!! isset($filter['priceRangeMax']) ? $filter['priceRangeMax'] : round($baseProducts->max('default_price'), 0) +1 !!};
-    {{--{!! dd( ($filter['priceRangeMax'])) !!}--}}
-    $("#min_price").val(setMin);
-    $("#max_price").val(setMax);
 
-    $("#slider-range").slider({
-        range: true,
-        orientation: "horizontal",
-        min: min,
-        max: max,
-        values: [setMin, setMax],
-        step: 1,
-        slide: function (event, ui) {
-            if (ui.values[0] == ui.values[1]) {
-                return false;
+//        $("#min_price").before("€");
+//        $("#max_price").before("€");
+
+        $("#slider-range").slider({
+            range: true,
+            orientation: "horizontal",
+            min: min,
+            max: max,
+            values: [setMin, setMax],
+            step: 1,
+            slide: function (event, ui) {
+                console.log('212');
+
+                if (ui.values[0] == ui.values[1]) {
+                    return false;
+                }
+
+                var minPrice = $("#min_price");
+                    minPrice.val(ui.values[0]);
+
+                var maxPrice = $("#max_price");
+                    maxPrice.val(ui.values[1]);
+
+                intervalTimer();
             }
+        });
 
-            $("#min_price").val(ui.values[0]);
-            $("#max_price").val(ui.values[1]);
-            intervalTimer();
+        $("#amount").change(function(){
+            var priceRange = $('#amount').val();
+            console.log(priceRange);
+        });
+
+
+        var timer;
+        function intervalTimer() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(function() {
+                clearInterval(timer);
+                submitForm();
+            }, 1500);
         }
-    });
+        function submitForm(){
+            $( "#filterForm" ).submit();
+        }
+        $('#datetimepicker1').change(function() {
+            intervalTimer();
+        });
 
-    $("#amount").change(function(){
-        var priceRange = $('#amount').val();
-        console.log(priceRange);
-    });
+        $('#filterForm').change(function() {
+            intervalTimer();
+        });
 
+//        function initCheckboxes()
+//        {
+        if($('.checkboxes li').length)
+        {
+            var boxes = $('.checkboxes li');
 
-    var timer;
-    function intervalTimer() {
-        if (timer) clearInterval(timer);
-        timer = setInterval(function() {
-            clearInterval(timer);
-            submitForm();
-        }, 1500);
-    }
-    function submitForm(){
-        $( "#filterForm" ).submit();
-    }
-    $('#datetimepicker1').change(function() {
-        intervalTimer();
-    });
+            boxes.each(function()
+            {
+                var box = $(this);
 
-    $('#filterForm').change(function() {
-        intervalTimer();
-    });
-</script>
+                box.on('click', function()
+                {
+                    if(box.hasClass('active'))
+                    {
+                        box.find('i').removeClass('fa-square');
+                        box.find('i').addClass('fa-square-o');
+                        box.toggleClass('active');
+                    }
+                    else
+                    {
+                        box.find('i').removeClass('fa-square-o');
+                        box.find('i').addClass('fa-square');
+                        box.toggleClass('active');
+                    }
+                    // box.toggleClass('active');
+                });
+            });
+
+            if($('.show_more').length)
+            {
+                $('.show_more').on('click', function(e)
+                {
+                    var checkboxes = $('.checkboxes#'+this.getAttribute('data-id'));
+                    var checkboxesActive = $('.checkboxes.active#'+this.getAttribute('data-id'));
+
+                    var contentName = $(this);
+
+                    if(checkboxesActive.length >= 1){
+                        contentName.html('<span><span>+</span>laat meer zien</span>')
+                    }else {
+                        contentName.html('<span><span>-</span>laat minder zien</span>')
+                    }
+
+                    checkboxes.toggleClass('active');
+                });
+            }
+        };
+//        }
+    </script>
 @endpush

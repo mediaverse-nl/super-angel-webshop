@@ -64,6 +64,7 @@ class ProductType extends Model
 
     public function getSellingPriceAttribute()
     {
-        return number_format($this->price - $this->product->discount, 2);
+        return   $this->price - $this->product->discount ;
+//        return number_format($this->price - $this->product->discount, 2);
     }
 }

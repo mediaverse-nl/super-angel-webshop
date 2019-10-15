@@ -3,6 +3,9 @@
 namespace App;
 
 use Carbon\Carbon;
+use Illuminate\Http\Response;
+use Image;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -77,6 +80,7 @@ class Product extends Model
 
     public function images($amount = '*')
     {
+
         $images = [];
 
         if(!empty($this->images)){

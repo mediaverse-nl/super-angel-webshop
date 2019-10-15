@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\Site;
 
-use App\Http\Requests\AddCartRequest;
-use App\Http\Requests\Site\OrderStoreRequest;
+use App\Http\Requests\Site\AddCartRequest;
 use App\Product;
 use App\ProductType;
 use Gloudemans\Shoppingcart\Facades\Cart;

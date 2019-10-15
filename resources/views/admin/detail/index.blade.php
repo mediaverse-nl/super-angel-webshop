@@ -6,8 +6,67 @@
 
 @section('content')
     <div class="row">
-        @foreach($property
-            ->chunk(ceil($property->count() / 4)) as $c)
+        {{--<div class="container">--}}
+            {{--@foreach(array_chunk($property->toArray(), 4) as $items)--}}
+                {{--<div class="row">--}}
+                    {{--@foreach($items as $item)--}}
+                        {{--<div class="col-md-{{12 / 4}}">--}}
+                            {{--<ul class="list-group list-group-flush">--}}
+                                {{--@foreach((new \App\Property($item))->details as $d)--}}
+                                    {{--<li class=" custom-list-grasertivapenhrpsphp oup-item ">--}}
+                                        {{--{!! $d->value !!}--}}
+                                        {{--<div class="float-right">--}}
+                                            {{--@component('components.model', [--}}
+                                               {{--'id' => 'userTableBtn'.$d->id,--}}
+                                               {{--'title' => 'Delete entry '. $d->value,--}}
+                                               {{--'actionRoute' => route('admin.detail.destroy', $d->id),--}}
+                                               {{--'btnClass' => 'btn btn-sm btn-danger delete',--}}
+                                               {{--'btnIcon' => 'fa fa-trash'--}}
+                                            {{--])--}}
+                                                {{--@slot('description')--}}
+                                                    {{--If u proceed u will <b>{!! $d ? 'restore' : 'delete' !!}</b> all relations--}}
+                                                {{--@endslot--}}
+                                            {{--@endcomponent--}}
+                                            {{--<a href="{{route('admin.detail.edit', $d->id)}}" class="btn btn-sm btn-warning edit">--}}
+                                                {{--<i class="fa fa-edit" ></i>--}}
+                                            {{--</a>--}}
+                                        {{--</div>--}}
+                                    {{--</li>--}}
+                                {{--@endforeach--}}
+                                {{--<li class="list-group-item" style="padding: .75rem 0rem;">--}}
+                                    {{--{!! Form::open(['url' => route('admin.detail.store-detail'), 'method' => 'POST']) !!}--}}
+                                    {{--<div class="row">--}}
+                                        {{--<div class="col-8">--}}
+                                            {{--<div class="form-group">--}}
+                                                {{--{!! dd($items) !!}--}}
+                                                {{--{!! Form::hidden('property_id', $item->id) !!}--}}
+                                                {{--{!! Form::text('value', null, ['class' => 'form-control'.(!$errors->has('value') ? '': ' is-invalid ')]) !!}--}}
+                                                {{--@include('components.error', ['field' => 'value'])--}}
+                                            {{--</div>--}}
+                                        {{--</div>--}}
+                                        {{--<div class="col-4">--}}
+                                            {{--<div style="height:100%; position:relative;">--}}
+                                                {{--{!! Form::submit("add", ['class' => 'btn btn-success btn-block','style' => 'position:absolute; bottom:17px;']) !!}--}}
+
+                                            {{--</div>--}}
+                                        {{--</div>--}}
+                                    {{--</div>--}}
+                                    {{--{!! Form::close() !!}--}}
+                                {{--</li>--}}
+
+                            {{--</ul>--}}
+                        {{--</div>--}}
+                    {{--@endforeach--}}
+                {{--</div>--}}
+            {{--@endforeach--}}
+        {{--</div>--}}
+        {{--<hr>--}}
+
+{{--        {!! dd($property->count(),  ceil($property->count() / 4) ) !!}--}}
+{{--        @foreach($property--}}
+            {{--->chunk(ceil($property->count() / 4)) as $c)--}}
+
+        @foreach($property->chunk(1) as $c)
 
             <div class="col-3">
                 @foreach($c as $p)
@@ -15,6 +74,7 @@
                         <div class="card-body">
                             <h3>
                                 {!! $p->value !!}
+                                {{--{!! $p->id !!}--}}
                                 @component('components.model', [
                                        'id' => 'propertyTableBtn'.$p->id,
                                        'title' => 'Delete entry '. $p->value,

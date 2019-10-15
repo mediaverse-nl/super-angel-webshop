@@ -16,7 +16,7 @@ class WelcomeController extends Controller
     {
         //default seo
         $this->seo()
-            ->setTitle($this->getPageSeo()->title .' | tantemartje.nl')
+            ->setTitle($this->getPageSeo()->title)
             ->setDescription($this->getPageSeo()->description);
         //opengraph
         $this->seo()

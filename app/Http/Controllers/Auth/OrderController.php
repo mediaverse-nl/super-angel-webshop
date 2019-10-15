@@ -58,6 +58,6 @@ class OrderController extends Controller
 
         $pdf = $this->pdf->loadView('pdf.invoice', ['order' => $order]);
 
-        return $pdf->download('fundoe-factuur-'.$order->id.'.pdf');
+        return $pdf->download('tantemartje-factuur-'.$order->id.'.pdf');
     }
 }

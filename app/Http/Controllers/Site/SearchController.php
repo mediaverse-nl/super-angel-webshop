@@ -13,7 +13,7 @@ class SearchController extends Controller
 //        return Event::find(2)->activity->title;
 
         return Product::search($request->get('q'))
-            ->with('activity')
+//            ->with('activity')
             ->get();
     }
 }

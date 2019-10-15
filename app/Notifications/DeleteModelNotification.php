@@ -40,6 +40,8 @@ class DeleteModelNotification extends Notification
      */
     public function toDatabase($notifiable)
     {
+        session()->put('success','Item deleted successfully.');
+
         return [
             'subject' => 'Deleted',
             'description' => 'Deleted entry: <b>'.$this->model->getTable().'</b>',

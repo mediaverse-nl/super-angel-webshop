@@ -10,7 +10,7 @@
 
                 <div class="breadcrumbs d-flex flex-row align-items-center" style="margin-bottom: 0px !important;">
                     <ul>
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="{!! route('home') !!}">Home</a></li>
                         <li class="active"><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i>Winkelwagen</a></li>
                     </ul>
                 </div>
@@ -140,19 +140,19 @@
                                     Verzendingskosten
                                     <small>excl. BTW</small>
                                 </strong>
-                                <strong>&euro;{!! Cart::count() == 0 ? '-' : env('SHIPPING_COST') !!}</strong>
+                                <strong>{!! Cart::count() == 0 ? '&euro;--' : (Cart::total() >= 75 ? 'Gratis' : env('SHIPPING_COST'))   !!}</strong>
                             </li>
                             <li class="d-flex justify-content-between py-3 border-bottom">
                                 <strong class="text-muted">
                                     BTW
                                     <small>21%</small>
                                 </strong>
-                                <strong>&euro;{!! number_format(Cart::tax() + calcBtwExcl(env('SHIPPING_COST'), 21), 2) !!}</strong>
+                                <strong>&euro;{!! Cart::count() == 0 ? '0.00' :  number_format(Cart::tax() + calcBtwExcl((Cart::total() >= 75 ? 0 : env('SHIPPING_COST')), 21), 2) !!}</strong>
                             </li>
                             <li class="d-flex justify-content-between py-3 border-bottom">
                                 <strong class="text-muted">Totaal</strong>
                                 <h5 class="font-weight-bold">
-                                    &euro;{!! number_format(Cart::total() + calcBtwExcl(env('SHIPPING_COST'), 21), 2) !!}
+                                    &euro;{!! Cart::count() == 0 ? '0.00' :  number_format(Cart::total() + calcBtwExcl((Cart::total() >= 75 ? 0 : env('SHIPPING_COST')), 21), 2) !!}
                                 </h5>
                             </li>
                         </ul>

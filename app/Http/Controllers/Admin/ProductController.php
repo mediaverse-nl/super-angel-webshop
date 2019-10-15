@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Detail;
-use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Requests\Admin\ProductUpdateRequest;
+use App\Notifications\DeleteModelNotification;
 use App\Notifications\StoreModelNotification;
 use App\Notifications\UpdateModelNotification;
 use App\Product;
 use App\ProductType;
 use App\Property;
 use App\ProductVariants;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ProductController extends Controller

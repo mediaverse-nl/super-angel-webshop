@@ -24,7 +24,7 @@ class CategoryStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'value' => 'required|unique:category,value',
+            'value' => 'required|unique:category,value|alpha_num',
         ];
     }
 }

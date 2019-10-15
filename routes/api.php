@@ -17,12 +17,6 @@
 //});
 
 //text editor
-Route::post('/text-editor-{id}', function(App\Http\Requests\Api\Admin\TextUpdateRequest $request, $id)
-{
-    $text = \App\Text::findOrFail($id);
+Route::post('/text-editor-{id}', 'Api\TextEditorController@edit');
 
-    $text->update(['text' => $request->text]);
-
-    return response()
-        ->json('ok', 200);
-});
+Route::get('/product-type-{productId}', 'Api\ProductTypeController@get');

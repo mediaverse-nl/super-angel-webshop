@@ -23,17 +23,50 @@ class ProductUpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $rules = [
+            'title' => 'required|min:2|max:70',
+            'description' => 'max:1000',
+            'default_price' => 'required|regex:/^\d+(\.\d{1,2})?$/',
+            'discount' => 'nullable|regex:/^\d+(\.\d{1,2})?$/',
+            'category_id' => 'required',
+            'meta_title' => 'max:70',
+            'meta_description' => 'max:180',
+        ];
+
+        $moreOptionsCheckbox = $this->request->get('more_variants');
+
+        if(isset($moreOptionsCheckbox))
+        {
+            if (isset($this->change_options)) {
+                $rules['variant_options'] = 'required';
+                if (isset($this->variant_options)){
+                    foreach ($this->variant_options as $key => $val){
+                        $rules['variant_options.'.$key] = 'required';
+                    }
+                }
+            }else if (isset($this->variants)){
+                foreach($this->variants as $key => $val) {
+                    $rules['variants.'.$key.'.stock'] = 'required|numeric';
+                    $rules['variants.'.$key.'.price'] = 'required|regex:/^\d+(\.\d{1,2})?$/';
+                    $rules['variants.'.$key.'.ean'] = 'required|min:4';
+                }
+            }else{
+                $rules['variant_options'] = 'required';
+            }
+        }else{
+            $rules['variant.stock'] = 'required|numeric';
+            $rules['variant.ean'] = 'required|min:4';
+        }
+
+        return  $rules;
+    }
+
+    public function messages()
+    {
         return [
-            'category' => 'required|numeric',
-            'img' => 'required|string',
-            'title' => 'required|string|min:5|max:60',
-            'description' => 'required|string|min:30|max:300',
-            'location' => 'string|nullable',
-            'region' => 'required|string',
-            'price_per_hour' => 'required',
-            'max_number_of_people' => 'required|numeric',
-            'min_number_of_people' => 'required|numeric',
-            'min_duration' => 'required|numeric',
+            'variant_options.*.required' => 'Dit veld is verplicht!',
+            'variants.*.required' => 'Dit veld is verplicht!',
+            'regex' => 'Dit veld moet een prijs zijn bv. 5.00, 50 of 23.05',
         ];
     }
 }

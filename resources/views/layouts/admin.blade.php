@@ -240,6 +240,7 @@
 
     <div class="content-wrapper">
         <div class="container-fluid">
+            @include('includes.notification')
             <!-- Breadcrumbs-->
             @yield('breadcrumb')
 

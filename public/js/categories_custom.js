@@ -21,7 +21,7 @@ jQuery(document).ready(function($)
 {
 	"use strict";
 
-	/* 
+	/*
 
 	1. Vars and Inits
 
@@ -53,10 +53,10 @@ jQuery(document).ready(function($)
 	initFavorite();
 	initFixProductBorder();
 	initIsotopeFiltering();
-	initPriceSlider();
-	initCheckboxes();
+	// initPriceSlider();
+	// initCheckboxes();
 
-	/* 
+	/*
 
 	2. Set Header
 
@@ -92,7 +92,7 @@ jQuery(document).ready(function($)
 		}
 	}
 
-	/* 
+	/*
 
 	3. Init Menu
 
@@ -155,7 +155,7 @@ jQuery(document).ready(function($)
 					    	panel.style.maxHeight = panel.scrollHeight + "px";
 					    }
 					}
-				}	
+				}
 			}
 		}
 	}
@@ -175,7 +175,7 @@ jQuery(document).ready(function($)
 		menuActive = false;
 	}
 
-	/* 
+	/*
 
 	4. Init Favorite
 
@@ -213,7 +213,7 @@ jQuery(document).ready(function($)
     	}
     }
 
-    /* 
+    /*
 
 	5. Init Fix Product Border
 
@@ -298,11 +298,11 @@ jQuery(document).ready(function($)
 					var product = $(products[i]);
 					product.css('border-right', 'none');
 				}
-			}	
+			}
     	}
     }
 
-    /* 
+    /*
 
 	6. Init Isotope Filtering
 
@@ -374,14 +374,14 @@ jQuery(document).ready(function($)
 
                         // console.log();
 
-                        // var yourArray = [];
-                        // $("#detail:checked").each(function(){
-                        //     yourArray.push($(this).val());
-                        // });
-                        //
-                        // console.log(yourArray);
+                        var yourArray = [];
+                        $("#detail:checked").each(function(){
+                            yourArray.push($(this).val());
+                        });
 
-                        // var propertiesRange = $('#detail');
+                        console.log(yourArray);
+
+                        // var propertiesRange = $('#detai
                         //
                         // console.log(propertiesRange);
                         //
@@ -402,75 +402,36 @@ jQuery(document).ready(function($)
     	}
     }
 
-    /* 
+    /*
 
 	7. Init Price Slider
 
 	*/
 
-    function initPriceSlider()
-    {
-		$( "#slider-range" ).slider(
-		{
-			range: true,
-			min: 0,
-			max: 1000,
-			values: [ 0, 580 ],
-			slide: function( event, ui )
-			{
-				$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-			}
-		});
-			
-		$( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) + " - $" + $( "#slider-range" ).slider( "values", 1 ) );
-    }
+    // function initPriceSlider()
+    // {
+		// $( "#slider-range" ).slider(
+		// {
+		// 	range: true,
+		// 	min: 0,
+		// 	max: 1000,
+		// 	// values: [ 0, 580 ],
+		// 	slide: function( event, ui )
+		// 	{
+		// 		$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+		// 	}
+		// });
+		//
+		// $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) + " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+    // }
 
-    /* 
+    /*
 
 	8. Init Checkboxes
 
 	*/
 
-    function initCheckboxes()
-    {
-    	if($('.checkboxes li').length)
-    	{
-    		var boxes = $('.checkboxes li');
 
-    		boxes.each(function()
-    		{
-    			var box = $(this);
-
-    			box.on('click', function()
-    			{
-    				if(box.hasClass('active'))
-    				{
-    					box.find('i').removeClass('fa-square');
-    					box.find('i').addClass('fa-square-o');
-    					box.toggleClass('active');
-    				}
-    				else
-    				{
-    					box.find('i').removeClass('fa-square-o');
-    					box.find('i').addClass('fa-square');
-    					box.toggleClass('active');
-    				}
-    				// box.toggleClass('active');
-    			});
-    		});
-
-    		if($('.show_more').length)
-    		{
-    			$('.show_more').on('click', function(e)
-    			{
-                    var checkboxes = $('.checkboxes#'+this.getAttribute('data-id'));
-
-                    // console.log(checkboxes);
-    				checkboxes.toggleClass('active');
-    			});
-    		}
-    	};
-    }
 
     // do stuff when checkbox change
     $('.sidebar').on('change', function( jQEvent ) {
@@ -504,10 +465,10 @@ jQuery(document).ready(function($)
                 $(this).html(numItems);
             }
             else {
-                var itemClass = $(this).prev('input').val().substring(1);
-                var itemSelector = ".product-grid div:hasClassStartingWith('" + itemClass + "')";
-                numItems = $(itemSelector).not(":hidden").length;
-                $(this).html(numItems);
+                // var itemClass = $(this).prev('input').val().substring(1);
+                // var itemSelector = ".product-grid div:hasClassStartingWith('" + itemClass + "')";
+                // numItems = $(itemSelector).not(":hidden").length;
+                // $(this).html(numItems);
             }
         });
     }

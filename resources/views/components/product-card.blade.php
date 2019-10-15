@@ -1,5 +1,5 @@
 {{--<div class="col-3" style="background: #FFFFFF !important; padding: 0px 0px !important; display: inline-block !important; height: 340px !important; " class="{{!empty($product->category) ? $product->category->value : null}} @foreach($product->productDetails as $x) {!! preg_replace("/[^a-zA-Z0-9]/", "", $x->detail->value) !!}@endforeach">--}}
-<div class="product-item {!! $product->category->value !!}" style="height: 340px !important; background: #FFFFFF">
+<div class="product-item {!! $product->category->value !!} {!! isset($classes) ? $classes : null !!}" style="{!! isset($style) ? $style : null !!} background: #FFFFFF">
     <a href="{!! route('site.product.show', [$product->urlTitle, $product->id]) !!}">
         <div class="product discount product_filter" style="border-top: 1px solid rgb(233, 233, 233); ">
             <div class="product_image">

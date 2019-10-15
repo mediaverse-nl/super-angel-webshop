@@ -28,27 +28,17 @@ class OrderStoreRequest extends FormRequest
         return [
             'email' => 'required|email',
             'naam' => 'required|max:60',
-            'straat' => 'required|max:150',
-            'huisnummer' => 'required|min:1|max:12',
-            'postcode' => 'required|min:1',
+            'straat' => 'required|min:5|max:120|string',
+            'huisnummer' => 'required|min:1|max:8|string',
+            'postcode' => 'required|min:4|max:8|string|regex:/^[1-9][0-9]{3}[\s]?[A-Za-z]{2}$/i',
             'woonplaats' => 'required|min:1',
             'land' => 'required|in:nederland,belgie',
-            'telefoonnummer_vast' => '',
-            'telefoonnummer_mobiel' => 'required|max:60',
+            'telefoonnummer_vast' => ['nullable','regex:#^(((0)[1-9]{2}[0-9][-]?[1-9][0-9]{5})|((\+31|0|0031)[1-9][0-9][-]?[1-9][0-9]{6}))$#'],
+            'telefoonnummer_mobiel' => ['required', 'regex:#^(((\+31|0|0031)6){1}[1-9]{1}[0-9]{7})$#i'],
             'aflevernotitie' => 'max:150',
             'opmerking' => 'max:500',
             'algemene_voorwaarden' => 'accepted',
+
         ];
-
-//        Session::flash('id', (int)$this->request->get('id'));
-//        Session::flash('activityType', 'public');
-
-//        $event = new Event();
-//        $event = $event->findOrFail($this->request->get('id'));
-//        return [
-//            'tickets' => 'required|numeric|in:'.implode(',', array_combine($event->publicTicketSelection(), $event->publicTicketSelection())),
-//            'voorwaarden' => 'accepted',
-//            'id' => 'required|integer',
-//        ];
     }
 }

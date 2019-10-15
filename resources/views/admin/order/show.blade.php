@@ -108,11 +108,11 @@
                                     </tr>
                                     <tr>
                                         <td><b>total_paid</b></td>
-                                        <td>&euro; {!! $order->total_paid !!}</td>
+                                        <td>&euro; {!! number_format($order->total_paid) !!}</td>
                                     </tr>
                                     <tr>
                                         <td><b>shopping_cost</b></td>
-                                        <td>&euro; {!!   ($order->shipping_costs) !!}</td>
+                                        <td> {!!  $order->shipping_costs != 0 ? '€'.number_format($order->shipping_costs,2) : 'gratis'!!}</td>
                                     </tr>
                                     <tr>
                                         <td><b>payment_id</b></td>
@@ -203,7 +203,7 @@
                                                 {!! ucfirst($order->country) !!}
                                             </td>
                                             <td style="padding: 0px 10px; ">
-{{--                                                {!! '<img style="width:100% !important;" src="data:image/png;base64,' . \DNS1D::getBarcodePNG("$order->id", "CODABAR",3,33) . '" alt="barcode"   />' !!}--}}
+                                                {!! '<img style="width:100% !important;" src="data:image/png;base64,' . \DNS1D::getBarcodePNG("$order->id", "CODABAR",3,33) . '" alt="barcode"   />' !!}
                                                 <br>
                                                 {!! ucfirst($order->created_at->format('d-m-Y H:m')) !!}
                                             </td>

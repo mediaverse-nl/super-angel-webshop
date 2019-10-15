@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <meta name="copyright" content="Tante Martje - All rights reserved">
+    <meta name="author" content="Tante Martje">
+
     {!! SEO::generate() !!}
 
     <link rel="stylesheet" type="text/css" href="/styles/bootstrap4/bootstrap.min.css">
@@ -42,6 +45,43 @@
         </style>
     @endif
 
+    <style>
+        /*// Small devices (landscape phones, 576px and up)*/
+        @media (min-width: 576px) {
+            #productContainers{
+                display: inline-flex;
+            }
+            .product-item{
+                height: 470px !important;
+            }
+        }
+        /*// Medium devices (tablets, 768px and up)*/
+        @media (min-width: 768px) {
+
+            .product-item{
+                height: 460px !important;
+            }
+        }
+        /*// Large devices (desktops, 992px and up)*/
+        @media (min-width: 992px) {
+            #productContainers{
+                display: inline-f lex;
+            }
+            .product-item{
+                height: 320px !important;
+            }
+        }
+        /*// Extra large devices (large desktops, 1200px and up)*/
+        @media (min-width: 1200px) {
+            #productContainers{
+                display: inline-f lex;
+            }
+            .product-item{
+                height: 340px !important;
+            }
+        }
+    </style>
+
     @stack('css')
 
 </head>
@@ -61,9 +101,6 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="newsletter_text d-flex flex-column justify-content-center align-items-lg-start align-items-md-center text-center">
-                        {{--<h4>Newsletter</h4>--}}
-                        {{--<p>Subscribe to our newsletter and get 20% off your first purchase</p>--}}
-
                         <h4>Nieuwsbrief</h4>
                         <p>Abonneer u op onze nieuwsbrief en ontvang alle nieuwsberichten</p>
                     </div>

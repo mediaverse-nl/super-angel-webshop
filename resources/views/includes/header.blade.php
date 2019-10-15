@@ -14,6 +14,14 @@
                     <div class="top_nav_right">
                         <ul class="top_nav_menu">
                             @if(auth()->check())
+                                @if(auth()->user()->admin(false))
+                                    <li class="account">
+                                        <a href="{!! route('admin.dashboard') !!}" style="padding: 0px 15px;">
+                                            Admin Panel
+                                             <i class="fa fa-dashboard"></i>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="account">
                                     <a href="#" style="padding: 0px 15px;">
                                         Welkom, {!! auth()->user()->name !!}

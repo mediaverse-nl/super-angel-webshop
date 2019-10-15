@@ -29,7 +29,7 @@
                                         <div class="form-group row" style="margin: 0px;">
                                             {!! Form::label('email', 'E-Mail adres', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
                                             <div class="col-12 col-lg-9 col-md-7">
-                                                {!! Form::email('email', null, ['disabled', 'class' => 'form_input'.(!$errors->has('email') ? '': ' is-invalid ')]) !!}
+                                                {!! Form::email('email', auth()->user()->email, ['disabled', 'class' => 'form_input'.(!$errors->has('email') ? '': ' is-invalid ')]) !!}
                                                 @include('components.error', ['field' => 'email'])
                                             </div>
                                         </div>
@@ -71,13 +71,6 @@
 
                                     <h4>Account gegevens</h4>
 
-                                    <div class="form-group row" style="margin: 0px;">
-                                        {!! Form::label('email', 'E-mail *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
-                                        <div class="col-12 col-lg-9 col-md-7">
-                                            {!! Form::email('email', null, ['class' => 'form_input'.(!$errors->has('email') ? '': ' is-invalid ')]) !!}
-                                            @include('components.error', ['field' => 'email'])
-                                        </div>
-                                    </div>
                                     <div class="form-group row" style="margin: 0px;">
                                         {!! Form::label('naam', 'Naam *', ['class' => 'col-12 col-lg-3 col-md-5 col-form-label font-weight-bold']) !!}
                                         <div class="col-12 col-lg-9 col-md-7">

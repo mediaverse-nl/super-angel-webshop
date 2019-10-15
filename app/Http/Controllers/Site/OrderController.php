@@ -36,6 +36,15 @@ class OrderController extends Controller
 
     public function store(OrderStoreRequest $request)
     {
+
+        if (Cart::total() >= 75){
+            $totalPrice = number_format(Cart::total(),2);
+            $shippingCosts = 0;
+        }else{
+            $totalPrice = number_format(Cart::total() +  calcBtwExcl(env('SHIPPING_COST'), 21), 2);
+            $shippingCosts = calcBtwExcl(env('SHIPPING_COST'), 21);
+        }
+
         $order = $this->order;
         $order->name = $request->naam;
         $order->email = $request->email;
@@ -48,14 +57,13 @@ class OrderController extends Controller
         $order->address_number = $request->huisnummer;
         $order->telephone_home = $request->telefoonnummer_vast;
         $order->telephone_mobile = $request->telefoonnummer_mobiel;
-        $order->total_paid = number_format(Cart::total() +  calcBtwExcl(env('SHIPPING_COST'), 21), 2);
-        $order->shipping_costs = calcBtwExcl(env('SHIPPING_COST'), 21);
+        $order->total_paid = $totalPrice;
+        $order->shipping_costs = $shippingCosts;
         $order->delivery_note = $request->aflevernotitie;
         $order->note = $request->opmerking;
         $order->status = self::STATUS_PENDING;
         $order->save();
         $products = [];
-
 
         foreach (Cart::content() as $i){
             $productType = $this->productType->find($i->options[0]->id);

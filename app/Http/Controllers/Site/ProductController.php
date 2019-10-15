@@ -25,11 +25,11 @@ class ProductController extends Controller
         if ($product->urlTitle !== $title){
             return redirect()->route('site.product.show', [$product->urlTitle, $product->id]);
         }
-
+        $product->created_at->toW3CString();
         //default seo
         $this->seo()
             ->addImages($product->thumbnail())
-            ->setTitle($product->title .' | tantemartje.nl')
+            ->setTitle(!empty($product->title) ? $product->title : $product->meta_title)
             ->setDescription(!empty($product->meta_description) ? $product->meta_description : $product->description);
         //opengraph
         $this->seo()

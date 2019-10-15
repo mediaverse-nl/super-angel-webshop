@@ -41,6 +41,8 @@ class UpdateModelNotification extends Notification
      */
     public function toDatabase($notifiable)
     {
+        session()->put('success','Item updated successfully.');
+
         return [
             'subject' => 'Updated',
             'description' => 'Updated entry: <b>'.$this->model->getTable().'</b>',

@@ -15,7 +15,7 @@
             <h6 class="dropdown-header">New Alerts:</h6>
             <div class="dropdown-divider"></div>
             @if(count(auth()->user()->unreadNotifications) >= 1)
-                @foreach (auth()->user()->unreadNotifications as $n)
+                @foreach (collect(auth()->user()->unreadNotifications)->take(7)->sortBy('created_at') as $n)
                     <a class="dropdown-item" href="#">
                         @if(str_contains($n->data['subject'], 'Updated'))
                             <span class="text-warning">
